@@ -911,7 +911,33 @@ input:focus{
 </section>
 
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
+const SUPABASE_URL = https://olyhvqjzhmtvphmlnpub.supabase.co;
+const SUPABASE_KEY = sb_publishable_2TNYkv1wT51BHZOJUc5FRA_4kRvxazH;
+
+const supabaseClient = supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+async function testSupabase() {
+    const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("username")
+        .limit(1);
+
+    if (error) {
+        console.error("Supabase error:", error);
+    } else {
+        console.log("✅ Supabase connected!", data);
+    }
+}
+
+testSupabase();
+
+
 
 /* =========================================================
    DATA
