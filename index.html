@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Try Catch Me!</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #111827;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        canvas {
+            background: linear-gradient(#101827, #18243a);
+            border: 3px solid white;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<canvas id="game" width="600" height="800"></canvas>
+
+<script>
+
+    // =====================================================
+    // SETUP
+    // =====================================================
+
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    let gameState = "playing";
+
+    const GAME_TIME = 30;
+
+    let timeLeft = GAME_TIME;
+    let score = 0;
+    let combo = 0;
+
+    let stars = [];
+    let bombs = [];
+
+    let lastTime = performance.now();
+    let spawnTimer = 0;
+
+    let animationTime = 0;
+
+
+    // =====================================================
+    // PLAYER
+    // =====================================================
+
+    const player = {
+        x: 275,
+        y: 690,
+        width: 70,
+        height: 90,
+        speed: 360
+    };
+
+
+    // =====================================================
+    // KEYBOARD
+    // =====================================================
+
+    const keys = {};
+
+    document.addEventListener("keydown", function(event) {
+
+        keys[event.key] = true;
+
+        if (
+            event.key === "ArrowLeft" ||
+            event.key === "ArrowRight" ||
+            event.key === " "
+        ) {
+            event.preventDefault();
+        }
+
+        // Restart after game over
+        if (event.key === " " && gameState === "gameover") {
+            restartGame();
+        }
+    });
+
+    document.addEventListener("keyup", function(event) {
+        keys[event.key] = false;
+    });
+
+
+    // =====================================================
+    // CREATE STAR
+    // =====================================================
+
+    function createStar(type) {
+
+        let size;
+        let speed;
+
+        if (type === "yellow") {
+            size = 18;
+            speed = 180;
+        }
+
+        if (type === "red") {
+            size = 21;
+            speed = 220;
+        }
+
+        if (type === "blue") {
+            size = 23;
+            speed = 280;
+        }
+
+        stars.push({
+            x: Math.random() * (canvas.width - 40) + 20,
+            y: -30,
+            size: size,
+            speed: speed,
+            type: type,
+            rotation: Math.random() * Math.PI
+        });
+    }
+
+
+    // =====================================================
+    // CREATE BOMB
+    // =====================================================
+
+    function createBomb() {
+
+        bombs.push({
+            x: Math.random() * (canvas.width - 40) + 20,
+            y: -40,
+            size: 24,
+            speed: 210,
+            rotation: 0
+        });
+    }
+
+
+    // =====================================================
+    // STAR SPAWNING
+    // =====================================================
+
+    function spawnObjects(deltaTime) {
+
+        spawnTimer += deltaTime;
+
+        // Difficulty increases as time passes
+        const difficulty = 1 + (GAME_TIME - timeLeft) / GAME_TIME;
+
+        const spawnInterval = Math.max(
+            0.25,
+            0.65 - difficulty * 0.15
+        );
+
+        if (spawnTimer >= spawnInterval) {
+
+            spawnTimer = 0;
+
+            const random = Math.random();
+
+            /*
+                Yellow = 70%
+                Red    = 20%
+                Blue   = 10%
+            */
+
+            if (random < 0.70) {
+                createStar("yellow");
+            }
+
+            else if (random < 0.90) {
+                createStar("red");
+            }
+
+            else {
+                createStar("blue");
+            }
+
+            // Bomb chance increases with difficulty
+            const bombChance = 0.08 + difficulty * 0.08;
+
+            if (Math.random() < bombChance) {
+                createBomb();
+            }
+        }
+    }
+
+
+    // =====================================================
+    // DRAW STAR
+    // =====================================================
+
+    function drawStar(x, y, radius, color, rotation) {
+
+        ctx.save();
+
+        ctx.translate(x, y);
+        ctx.rotate(rotation);
+
+        ctx.beginPath();
+
+        for (let i = 0; i < 10; i++) {
+
+            const angle = -Math.PI / 2 + i * Math.PI / 5;
+
+            const currentRadius =
+                i % 2 === 0
+                    ? radius
+                    : radius * 0.45;
+
+            const px = Math.cos(angle) * currentRadius;
+            const py = Math.sin(angle) * currentRadius;
+
+            if (i === 0) {
+                ctx.moveTo(px, py);
+            } else {
+                ctx.lineTo(px, py);
+            }
+        }
+
+        ctx.closePath();
+
+        ctx.fillStyle = color;
+        ctx.fill();
+
+        ctx.restore();
+    }
+
+
+    // =====================================================
+    // DRAW COMET
+    // =====================================================
+
+    function drawComet(star) {
+
+        ctx.save();
+
+        // Comet trail
+        const gradient = ctx.createLinearGradient(
+            star.x,
+            star.y - 90,
+            star.x,
+            star.y
+        );
+
+        gradient.addColorStop(0, "rgba(80,160,255,0)");
+        gradient.addColorStop(1, "rgba(80,160,255,0.7)");
+
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = 12;
+        ctx.lineCap = "round";
+
+        ctx.beginPath();
+        ctx.moveTo(star.x, star.y - 90);
+        ctx.lineTo(star.x, star.y);
+        ctx.stroke();
+
+        // Little comet lines
+        ctx.strokeStyle = "rgba(150,210,255,0.8)";
+        ctx.lineWidth = 3;
+
+        ctx.beginPath();
+        ctx.moveTo(star.x - 15, star.y - 55);
+        ctx.lineTo(star.x - 28, star.y - 75);
+
+        ctx.moveTo(star.x + 12, star.y - 35);
+        ctx.lineTo(star.x + 28, star.y - 55);
+
+        ctx.stroke();
+
+        drawStar(
+            star.x,
+            star.y,
+            star.size,
+            "#38bdf8",
+            star.rotation
+        );
+
+        ctx.restore();
+    }
+
+
+    // =====================================================
+    // DRAW BOMB
+    // =====================================================
+
+    function drawBomb(bomb) {
+
+        ctx.save();
+
+        ctx.translate(bomb.x, bomb.y);
+
+        // Fuse
+        ctx.strokeStyle = "#777";
+        ctx.lineWidth = 3;
+
+        ctx.beginPath();
+        ctx.moveTo(0, -bomb.size / 2);
+        ctx.quadraticCurveTo(
+            5,
+            -bomb.size - 10,
+            12,
+            -bomb.size - 4
+        );
+        ctx.stroke();
+
+        // Spark
+        ctx.fillStyle =
+            Math.sin(animationTime * 12) > 0
+                ? "#ffcc00"
+                : "#ff5c33";
+
+        ctx.beginPath();
+        ctx.arc(12, -bomb.size - 5, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Bomb body
+        ctx.fillStyle = "#050505";
+
+        ctx.beginPath();
+        ctx.arc(
+            0,
+            0,
+            bomb.size / 2,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        // Highlight
+        ctx.fillStyle = "#444";
+
+        ctx.beginPath();
+        ctx.arc(
+            -6,
+            -7,
+            5,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+        ctx.restore();
+    }
+
+
+    // =====================================================
+    // DRAW PLAYER
+    // =====================================================
+
+    function drawPlayer() {
+
+        const walking =
+            keys["ArrowLeft"] ||
+            keys["ArrowRight"];
+
+        const bounce =
+            walking
+                ? Math.sin(animationTime * 12) * 3
+                : Math.sin(animationTime * 3) * 1;
+
+        const x = player.x;
+        const y = player.y + bounce;
+
+        ctx.save();
+
+        // -------------------------------
+        // Shadow
+        // -------------------------------
+
+        ctx.fillStyle = "rgba(0,0,0,0.3)";
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            x + 35,
+            y + 88,
+            30,
+            7,
+            0,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        // -------------------------------
+        // Legs
+        // -------------------------------
+
+        ctx.strokeStyle = "#263238";
+        ctx.lineWidth = 9;
+        ctx.lineCap = "round";
+
+        const legMovement =
+            walking
+                ? Math.sin(animationTime * 12) * 7
+                : 0;
+
+        ctx.beginPath();
+
+        ctx.moveTo(x + 28, y + 65);
+        ctx.lineTo(
+            x + 25 + legMovement,
+            y + 82
+        );
+
+        ctx.moveTo(x + 43, y + 65);
+        ctx.lineTo(
+            x + 46 - legMovement,
+            y + 82
+        );
+
+        ctx.stroke();
+
+
+        // -------------------------------
+        // Body
+        // -------------------------------
+
+        ctx.fillStyle = "#5b8def";
+
+        ctx.beginPath();
+
+        ctx.roundRect(
+            x + 15,
+            y + 30,
+            35,
+            42,
+            12
+        );
+
+        ctx.fill();
+
+
+        // -------------------------------
+        // Head
+        // -------------------------------
+
+        ctx.fillStyle = "#ffd2a6";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x + 32,
+            y + 18,
+            22,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        // -------------------------------
+        // Hair
+        // -------------------------------
+
+        ctx.fillStyle = "#3a2520";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            x + 32,
+            y + 10,
+            21,
+            Math.PI,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        // -------------------------------
+        // Eyes
+        // -------------------------------
+
+        ctx.fillStyle = "#111";
+
+        ctx.beginPath();
+        ctx.arc(x + 24, y + 19, 2.5, 0, Math.PI * 2);
+        ctx.arc(x + 40, y + 19, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+
+        // -------------------------------
+        // Arms
+        // -------------------------------
+
+        ctx.strokeStyle = "#ffd2a6";
+        ctx.lineWidth = 8;
+
+        ctx.beginPath();
+
+        ctx.moveTo(x + 17, y + 40);
+        ctx.lineTo(x + 5, y + 55);
+
+        ctx.moveTo(x + 48, y + 40);
+        ctx.lineTo(x + 60, y + 55);
+
+        ctx.stroke();
+
+
+        // -------------------------------
+        // Basket
+        // -------------------------------
+
+        ctx.fillStyle = "#c58a45";
+
+        ctx.beginPath();
+
+        ctx.moveTo(x + 7, y + 52);
+        ctx.lineTo(x + 63, y + 52);
+        ctx.lineTo(x + 56, y + 78);
+        ctx.lineTo(x + 14, y + 78);
+
+        ctx.closePath();
+
+        ctx.fill();
+
+
+        // Basket stripes
+        ctx.strokeStyle = "#8a5a25";
+        ctx.lineWidth = 3;
+
+        for (let i = 0; i < 4; i++) {
+
+            const basketX = x + 17 + i * 12;
+
+            ctx.beginPath();
+
+            ctx.moveTo(basketX, y + 55);
+            ctx.lineTo(basketX + 3, y + 75);
+
+            ctx.stroke();
+        }
+
+        ctx.restore();
+    }
+
+
+    // =====================================================
+    // COLLISION DETECTION
+    // =====================================================
+
+    function isColliding(object) {
+
+        return (
+            object.x + object.size >
+                player.x &&
+
+            object.x - object.size <
+                player.x + player.width &&
+
+            object.y + object.size >
+                player.y &&
+
+            object.y - object.size <
+                player.y + player.height
+        );
+    }
+
+
+    // =====================================================
+    // UPDATE STARS
+    // =====================================================
+
+    function updateStars(deltaTime) {
+
+        for (let i = stars.length - 1; i >= 0; i--) {
+
+            const star = stars[i];
+
+            star.y += star.speed * deltaTime;
+
+            star.rotation += deltaTime * 2;
+
+
+            // Catch star
+            if (isColliding(star)) {
+
+                if (star.type === "yellow") {
+                    score += 1;
+                }
+
+                else if (star.type === "red") {
+                    score += 2;
+                }
+
+                else if (star.type === "blue") {
+                    score += 3;
+                }
+
+                combo++;
+
+                stars.splice(i, 1);
+
+                continue;
+            }
+
+
+            // Remove when off screen
+            if (star.y > canvas.height + 50) {
+
+                // Missing a star breaks combo
+                combo = 0;
+
+                stars.splice(i, 1);
+            }
+        }
+    }
+
+
+    // =====================================================
+    // UPDATE BOMBS
+    // =====================================================
+
+    function updateBombs(deltaTime) {
+
+        for (let i = bombs.length - 1; i >= 0; i--) {
+
+            const bomb = bombs[i];
+
+            bomb.y += bomb.speed * deltaTime;
+
+
+            // Hit bomb
+            if (isColliding(bomb)) {
+
+                score -= 2;
+
+                // Score cannot go below zero
+                if (score < 0) {
+                    score = 0;
+                }
+
+                combo = 0;
+
+                bombs.splice(i, 1);
+
+                continue;
+            }
+
+
+            // Remove bomb
+            if (bomb.y > canvas.height + 50) {
+
+                bombs.splice(i, 1);
+            }
+        }
+    }
+
+
+    // =====================================================
+    // MOVE PLAYER
+    // =====================================================
+
+    function updatePlayer(deltaTime) {
+
+        if (keys["ArrowLeft"]) {
+            player.x -= player.speed * deltaTime;
+        }
+
+        if (keys["ArrowRight"]) {
+            player.x += player.speed * deltaTime;
+        }
+
+
+        // Screen boundaries
+
+        if (player.x < 0) {
+            player.x = 0;
+        }
+
+        if (player.x + player.width > canvas.width) {
+            player.x =
+                canvas.width - player.width;
+        }
+    }
+
+
+    // =====================================================
+    // DRAW BACKGROUND
+    // =====================================================
+
+    function drawBackground() {
+
+        // Stars in background
+
+        ctx.fillStyle = "rgba(255,255,255,0.4)";
+
+        const backgroundStars = [
+            [60, 100],
+            [140, 170],
+            [230, 90],
+            [350, 140],
+            [460, 80],
+            [540, 190],
+            [90, 300],
+            [400, 260],
+            [520, 350]
+        ];
+
+        for (const point of backgroundStars) {
+
+            ctx.beginPath();
+
+            ctx.arc(
+                point[0],
+                point[1],
+                2,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+        }
+    }
+
+
+    // =====================================================
+    // DRAW UI
+    // =====================================================
+
+    function drawUI() {
+
+        // Score
+
+        ctx.fillStyle = "white";
+        ctx.font = "bold 25px Arial";
+
+        ctx.fillText(
+            "⭐ " + score,
+            20,
+            38
+        );
+
+
+        // Timer
+
+        ctx.fillStyle =
+            timeLeft <= 10
+                ? "#ff5555"
+                : "white";
+
+        ctx.fillText(
+            "⏱ " + Math.ceil(timeLeft),
+            480,
+            38
+        );
+
+
+        // Combo
+
+        if (combo >= 2) {
+
+            ctx.fillStyle = "#ffd700";
+            ctx.font = "bold 20px Arial";
+
+            ctx.textAlign = "center";
+
+            ctx.fillText(
+                "COMBO x" + combo,
+                canvas.width / 2,
+                38
+            );
+
+            ctx.textAlign = "left";
+        }
+    }
+
+
+    // =====================================================
+    // GAME OVER SCREEN
+    // =====================================================
+
+    function drawGameOver() {
+
+        ctx.fillStyle = "rgba(0,0,0,0.75)";
+
+        ctx.fillRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+
+        ctx.textAlign = "center";
+
+        ctx.fillStyle = "white";
+
+        ctx.font = "bold 48px Arial";
+
+        ctx.fillText(
+            "TIME'S UP!",
+            canvas.width / 2,
+            250
+        );
+
+
+        ctx.font = "bold 38px Arial";
+
+        ctx.fillText(
+            "⭐ " + score,
+            canvas.width / 2,
+            320
+        );
+
+
+        // Reward
+
+        let title;
+        let reward;
+
+        if (score >= 45) {
+
+            title = "👑 MASTER CATCHER";
+            reward = "Gold Reward";
+
+        }
+
+        else if (score >= 25) {
+
+            title = "🥈 STAR CATCHER";
+            reward = "Silver Reward";
+
+        }
+
+        else {
+
+            title = "🥉 BASKET BEGINNER";
+            reward = "Bronze Reward";
+        }
+
+
+        ctx.font = "bold 26px Arial";
+
+        ctx.fillStyle = "#ffd700";
+
+        ctx.fillText(
+            title,
+            canvas.width / 2,
+            390
+        );
+
+
+        ctx.font = "20px Arial";
+
+        ctx.fillStyle = "white";
+
+        ctx.fillText(
+            reward,
+            canvas.width / 2,
+            430
+        );
+
+
+        ctx.font = "18px Arial";
+
+        ctx.fillText(
+            "Press SPACE to try again",
+            canvas.width / 2,
+            500
+        );
+
+
+        ctx.textAlign = "left";
+    }
+
+
+    // =====================================================
+    // RESTART
+    // =====================================================
+
+    function restartGame() {
+
+        score = 0;
+        combo = 0;
+
+        timeLeft = GAME_TIME;
+
+        stars = [];
+        bombs = [];
+
+        spawnTimer = 0;
+
+        player.x = 275;
+
+        gameState = "playing";
+
+        lastTime = performance.now();
+    }
+
+
+    // =====================================================
+    // MAIN GAME LOOP
+    // =====================================================
+
+    function gameLoop(currentTime) {
+
+        const deltaTime =
+            Math.min(
+                (currentTime - lastTime) / 1000,
+                0.05
+            );
+
+        lastTime = currentTime;
+
+        animationTime += deltaTime;
+
+
+        // ---------------------------------------------
+        // PLAYING
+        // ---------------------------------------------
+
+        if (gameState === "playing") {
+
+            timeLeft -= deltaTime;
+
+            if (timeLeft <= 0) {
+
+                timeLeft = 0;
+
+                gameState = "gameover";
+            }
+
+            else {
+
+                updatePlayer(deltaTime);
+
+                spawnObjects(deltaTime);
+
+                updateStars(deltaTime);
+
+                updateBombs(deltaTime);
+            }
+        }
+
+
+        // ---------------------------------------------
+        // DRAW
+        // ---------------------------------------------
+
+        ctx.clearRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        drawBackground();
+
+
+        // Stars
+
+        for (const star of stars) {
+
+            if (star.type === "yellow") {
+
+                drawStar(
+                    star.x,
+                    star.y,
+                    star.size,
+                    "#ffd43b",
+                    star.rotation
+                );
+            }
+
+            else if (star.type === "red") {
+
+                drawStar(
+                    star.x,
+                    star.y,
+                    star.size,
+                    "#ff4d5a",
+                    star.rotation
+                );
+            }
+
+            else if (star.type === "blue") {
+
+                drawComet(star);
+            }
+        }
+
+
+        // Bombs
+
+        for (const bomb of bombs) {
+            drawBomb(bomb);
+        }
+
+
+        // Player
+
+        drawPlayer();
+
+        // UI
+
+        drawUI();
+
+
+        // Game over
+
+        if (gameState === "gameover") {
+            drawGameOver();
+        }
+
+
+        requestAnimationFrame(gameLoop);
+    }
+
+
+    // =====================================================
+    // START
+    // =====================================================
+
+    requestAnimationFrame(gameLoop);
+
+</script>
+
+</body>
+</html>
