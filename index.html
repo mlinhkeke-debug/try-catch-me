@@ -1,1040 +1,4160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Try Catch Me!</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Try Catch Me! — v2.0</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
-        body {
-            margin: 0;
-            background: #111827;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: Arial, sans-serif;
-        }
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 50% 0%,#243b73 0%,#0b1227 45%,#050812 100%);
+  color:#fff;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  overflow-x:hidden;
+}
 
-        canvas {
-            background: linear-gradient(#101827, #18243a);
-            border: 3px solid white;
-            border-radius: 12px;
-        }
-    </style>
+button{
+  font:inherit;
+}
+
+.screen{
+  display:none;
+  min-height:100vh;
+  width:100%;
+  padding:25px;
+}
+
+.screen.active{
+  display:flex;
+}
+
+.center{
+  justify-content:center;
+  align-items:center;
+}
+
+.panel{
+  width:min(1100px,100%);
+  margin:auto;
+  background:rgba(10,17,37,.78);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:28px;
+  padding:28px;
+  box-shadow:
+    0 25px 80px rgba(0,0,0,.45),
+    inset 0 1px rgba(255,255,255,.06);
+  backdrop-filter:blur(18px);
+}
+
+.logo{
+  font-size:clamp(42px,7vw,82px);
+  font-weight:1000;
+  letter-spacing:-4px;
+  text-align:center;
+  background:linear-gradient(120deg,#fff,#83c5ff,#d9b5ff);
+  -webkit-background-clip:text;
+  color:transparent;
+  text-shadow:0 10px 50px rgba(95,180,255,.25);
+}
+
+.subtitle{
+  text-align:center;
+  color:#9caed1;
+  margin-top:8px;
+}
+
+.nameBox{
+  max-width:520px;
+  margin:45px auto 0;
+}
+
+input{
+  width:100%;
+  padding:17px 20px;
+  border-radius:15px;
+  border:1px solid rgba(255,255,255,.15);
+  background:rgba(0,0,0,.3);
+  color:#fff;
+  outline:none;
+  font-size:17px;
+}
+
+input:focus{
+  border-color:#69b7ff;
+  box-shadow:0 0 0 4px rgba(70,160,255,.1);
+}
+
+.primary{
+  width:100%;
+  margin-top:14px;
+  border:0;
+  border-radius:15px;
+  padding:17px;
+  background:linear-gradient(135deg,#5aa9ff,#825cff);
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+  transition:.2s;
+  box-shadow:0 10px 30px rgba(70,110,255,.25);
+}
+
+.primary:hover{
+  transform:translateY(-2px);
+  filter:brightness(1.08);
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  flex-wrap:wrap;
+}
+
+.header h1{
+  font-size:32px;
+}
+
+.stats{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.stat{
+  padding:11px 16px;
+  border-radius:14px;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.stat b{
+  color:#ffd65a;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:15px;
+  margin-top:25px;
+}
+
+.card{
+  padding:20px;
+  border-radius:20px;
+  background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.025));
+  border:1px solid rgba(255,255,255,.1);
+  transition:.2s;
+}
+
+.card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(130,190,255,.4);
+}
+
+.card h3{
+  margin-bottom:7px;
+}
+
+.card p{
+  color:#98a9ca;
+  font-size:14px;
+  line-height:1.5;
+}
+
+.bigIcon{
+  height:100px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:62px;
+}
+
+.price{
+  color:#ffd95a;
+  font-weight:900;
+  margin:12px 0;
+}
+
+.smallBtn{
+  width:100%;
+  border:0;
+  border-radius:12px;
+  padding:12px;
+  cursor:pointer;
+  background:#263858;
+  color:#fff;
+  font-weight:800;
+}
+
+.smallBtn:hover{
+  background:#385277;
+}
+
+.smallBtn.equipped{
+  background:#2b9b72;
+}
+
+.smallBtn.locked{
+  opacity:.55;
+  cursor:not-allowed;
+}
+
+.nav{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:25px;
+}
+
+.nav button{
+  flex:1;
+  min-width:130px;
+  border:0;
+  border-radius:13px;
+  padding:13px;
+  background:rgba(255,255,255,.07);
+  color:#fff;
+  cursor:pointer;
+  font-weight:800;
+}
+
+.nav button:hover{
+  background:rgba(255,255,255,.13);
+}
+
+.heroPreview{
+  height:150px;
+  border-radius:17px;
+  margin-bottom:15px;
+  background:
+    radial-gradient(circle,#344c80,#121a31);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.heroEmoji{
+  font-size:80px;
+  filter:drop-shadow(0 10px 12px rgba(0,0,0,.5));
+}
+
+.tag{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:99px;
+  font-size:11px;
+  font-weight:900;
+  background:rgba(255,255,255,.08);
+  color:#a9c3e9;
+  margin-bottom:8px;
+}
+
+.lockedOverlay{
+  opacity:.55;
+}
+
+.mission{
+  position:relative;
+  overflow:hidden;
+}
+
+.progress{
+  height:8px;
+  border-radius:99px;
+  overflow:hidden;
+  background:#101a2c;
+  margin:13px 0;
+}
+
+.progress div{
+  height:100%;
+  background:linear-gradient(90deg,#54b6ff,#a06cff);
+  width:0%;
+  transition:.3s;
+}
+
+.badgeIcon{
+  font-size:48px;
+  margin-bottom:8px;
+}
+
+#gameScreen{
+  padding:0;
+  background:#040816;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+}
+
+.gameTop{
+  width:min(600px,100%);
+  padding:12px 15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  background:rgba(5,10,25,.9);
+  z-index:5;
+}
+
+.gameStat{
+  font-size:13px;
+  color:#b8c9e7;
+}
+
+.gameStat strong{
+  display:block;
+  color:#fff;
+  font-size:20px;
+}
+
+.comboBox{
+  flex:1;
+  text-align:center;
+}
+
+.comboText{
+  color:#ffd45c;
+  font-weight:1000;
+}
+
+.comboBar{
+  height:6px;
+  margin-top:4px;
+  background:#172238;
+  border-radius:99px;
+  overflow:hidden;
+}
+
+#comboFill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#ffd34e,#ff7a43);
+  transition:.15s;
+}
+
+#gameCanvas{
+  width:min(600px,100vw);
+  height:auto;
+  aspect-ratio:3/4;
+  display:block;
+  background:#071126;
+  touch-action:none;
+}
+
+.controls{
+  width:min(600px,100%);
+  display:flex;
+  justify-content:center;
+  gap:15px;
+  padding:15px;
+  background:#050a18;
+}
+
+.controlBtn{
+  width:120px;
+  height:55px;
+  border:0;
+  border-radius:17px;
+  background:#172642;
+  color:white;
+  font-size:26px;
+  font-weight:900;
+  user-select:none;
+  touch-action:none;
+}
+
+.frenzy{
+  position:fixed;
+  top:70px;
+  left:50%;
+  transform:translateX(-50%) scale(.8);
+  opacity:0;
+  pointer-events:none;
+  z-index:20;
+  padding:12px 25px;
+  border-radius:99px;
+  background:linear-gradient(90deg,#ffbf31,#ff4e7b,#a557ff);
+  font-weight:1000;
+  font-size:22px;
+  box-shadow:0 0 40px rgba(255,100,160,.45);
+  transition:.25s;
+}
+
+.frenzy.show{
+  opacity:1;
+  transform:translateX(-50%) scale(1);
+}
+
+.resultScore{
+  text-align:center;
+  font-size:70px;
+  font-weight:1000;
+  margin:15px;
+  background:linear-gradient(120deg,#fff,#7fc7ff,#d28cff);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.reward{
+  text-align:center;
+  color:#ffd65b;
+  font-size:22px;
+  font-weight:900;
+}
+
+.resultButtons{
+  max-width:500px;
+  margin:25px auto;
+  display:grid;
+  gap:10px;
+}
+
+.adminDanger{
+  background:#7e2934;
+}
+
+.adminGrid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:12px;
+  margin-top:15px;
+}
+
+.adminBox{
+  padding:16px;
+  border-radius:15px;
+  background:rgba(255,255,255,.05);
+}
+
+.adminBox h3{
+  margin-bottom:10px;
+}
+
+.adminBox input{
+  margin-bottom:8px;
+}
+
+.notice{
+  padding:12px 15px;
+  border-radius:13px;
+  background:rgba(255,213,77,.08);
+  border:1px solid rgba(255,213,77,.18);
+  color:#e8dca9;
+  font-size:13px;
+  margin-top:15px;
+}
+
+@media(max-width:600px){
+  .panel{
+    padding:18px;
+    border-radius:20px;
+  }
+
+  .screen{
+    padding:12px;
+  }
+
+  .logo{
+    letter-spacing:-2px;
+  }
+
+  .header h1{
+    font-size:25px;
+  }
+}
+</style>
 </head>
 
 <body>
 
-<canvas id="game" width="600" height="800"></canvas>
+<!-- NAME -->
+<section id="nameScreen" class="screen center active">
+  <div class="panel">
+    <div class="logo">TRY CATCH ME!</div>
+    <div class="subtitle">
+      Catch. Combo. Upgrade. Become legendary.
+    </div>
+
+    <div class="nameBox">
+      <input id="nameInput" maxlength="18" placeholder="Enter your hero name...">
+      <button class="primary" onclick="startProfile()">
+        ENTER THE LOBBY →
+      </button>
+    </div>
+  </div>
+</section>
+
+
+<!-- LOBBY -->
+<section id="lobbyScreen" class="screen center">
+  <div class="panel">
+
+    <div class="header">
+      <div>
+        <h1>⚡ Welcome, <span id="playerName"></span></h1>
+        <p class="subtitle" style="text-align:left">
+          Your personal hero headquarters
+        </p>
+      </div>
+
+      <div class="stats">
+        <div class="stat">🪙 <b id="coinDisplay">0</b></div>
+        <div class="stat">🏆 <b id="badgeDisplay">0</b></div>
+        <div class="stat">⭐ Best <b id="bestDisplay">0</b></div>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <div class="card">
+        <div class="bigIcon">🎮</div>
+        <h3>PLAY</h3>
+        <p>30 seconds. Catch as much as you can.</p>
+        <button class="primary" onclick="startGame()">PLAY NOW</button>
+      </div>
+
+      <div class="card">
+        <div class="bigIcon">🦸</div>
+        <h3>HEROES</h3>
+        <p>Collect original superhero-inspired heroes.</p>
+        <button class="smallBtn" onclick="showScreen('skinsScreen');renderHeroes()">
+          OPEN HERO SHOP
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="bigIcon">🧤</div>
+        <h3>ACCESSORIES</h3>
+        <p>Equip masks, shields, helmets, capes and effects.</p>
+        <button class="smallBtn" onclick="showScreen('accessoriesScreen');renderAccessories()">
+          OPEN ACCESSORIES
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="bigIcon">🎖️</div>
+        <h3>BADGES</h3>
+        <p>Complete achievements and build your collection.</p>
+        <button class="smallBtn" onclick="showScreen('badgesScreen');renderBadges()">
+          VIEW BADGES
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="bigIcon">🎯</div>
+        <h3>MISSIONS</h3>
+        <p>Complete goals for extra coins.</p>
+        <button class="smallBtn" onclick="showScreen('missionsScreen');renderMissions()">
+          VIEW MISSIONS
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="bigIcon">🛠️</div>
+        <h3>DEVELOPER</h3>
+        <p>Local development controls.</p>
+        <button class="smallBtn" onclick="openAdmin()">
+          ADMIN CENTER
+        </button>
+      </div>
+
+    </div>
+
+    <div class="notice">
+      💡 Tip: build combos to trigger <b>FRENZY MODE</b>.
+      Golden stars are worth more, but danger increases.
+    </div>
+
+  </div>
+</section>
+
+
+<!-- HERO SHOP -->
+<section id="skinsScreen" class="screen center">
+  <div class="panel">
+
+    <div class="header">
+      <div>
+        <h1>🦸 HERO VAULT</h1>
+        <p class="subtitle" style="text-align:left">
+          Original heroes with different visual identities.
+        </p>
+      </div>
+
+      <div class="stat">
+        🪙 <b id="heroCoins">0</b>
+      </div>
+    </div>
+
+    <div id="heroGrid" class="grid"></div>
+
+    <div class="nav">
+      <button onclick="showScreen('lobbyScreen');updateUI()">← Lobby</button>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ACCESSORIES -->
+<section id="accessoriesScreen" class="screen center">
+  <div class="panel">
+
+    <div class="header">
+      <div>
+        <h1>🧩 ACCESSORY LAB</h1>
+        <p class="subtitle" style="text-align:left">
+          Cosmetic items. Mix and match your loadout.
+        </p>
+      </div>
+
+      <div class="stat">
+        🪙 <b id="accessoryCoins">0</b>
+      </div>
+    </div>
+
+    <div id="accessoryGrid" class="grid"></div>
+
+    <div class="nav">
+      <button onclick="showScreen('lobbyScreen');updateUI()">← Lobby</button>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- BADGES -->
+<section id="badgesScreen" class="screen center">
+  <div class="panel">
+
+    <div class="header">
+      <div>
+        <h1>🏆 BADGE COLLECTION</h1>
+        <p class="subtitle" style="text-align:left">
+          Collect them all.
+        </p>
+      </div>
+    </div>
+
+    <div id="badgeGrid" class="grid"></div>
+
+    <div class="nav">
+      <button onclick="showScreen('lobbyScreen');updateUI()">← Lobby</button>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- MISSIONS -->
+<section id="missionsScreen" class="screen center">
+  <div class="panel">
+
+    <div class="header">
+      <div>
+        <h1>🎯 MISSIONS</h1>
+        <p class="subtitle" style="text-align:left">
+          Skill challenges with guaranteed rewards.
+        </p>
+      </div>
+    </div>
+
+    <div id="missionGrid" class="grid"></div>
+
+    <div class="nav">
+      <button onclick="showScreen('lobbyScreen');updateUI()">← Lobby</button>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- GAME -->
+<section id="gameScreen" class="screen">
+
+  <div class="gameTop">
+
+    <div class="gameStat">
+      TIME
+      <strong id="timeDisplay">30</strong>
+    </div>
+
+    <div class="comboBox">
+      <div class="comboText" id="comboDisplay">COMBO x0</div>
+      <div class="comboBar">
+        <div id="comboFill"></div>
+      </div>
+    </div>
+
+    <div class="gameStat" style="text-align:right">
+      SCORE
+      <strong id="scoreDisplay">0</strong>
+    </div>
+
+  </div>
+
+  <canvas id="gameCanvas" width="600" height="800"></canvas>
+
+  <div class="controls">
+    <button class="controlBtn" id="leftBtn">←</button>
+    <button class="controlBtn" id="rightBtn">→</button>
+  </div>
+
+  <div class="frenzy" id="frenzyBanner">
+    ⚡ FRENZY MODE ⚡
+  </div>
+
+</section>
+
+
+<!-- RESULT -->
+<section id="resultScreen" class="screen center">
+  <div class="panel">
+
+    <h1 style="text-align:center">ROUND COMPLETE</h1>
+
+    <div class="resultScore" id="resultScore">0</div>
+
+    <div class="reward">
+      +<span id="resultCoins">0</span> 🪙
+    </div>
+
+    <p id="resultMessage"
+       style="text-align:center;color:#a9b9d7;margin-top:10px">
+    </p>
+
+    <div class="grid" style="max-width:700px;margin-left:auto;margin-right:auto">
+
+      <div class="card">
+        <h3>⭐ Stars</h3>
+        <p id="resultStars">0</p>
+      </div>
+
+      <div class="card">
+        <h3>☄️ Comets</h3>
+        <p id="resultComets">0</p>
+      </div>
+
+      <div class="card">
+        <h3>🔥 Best Combo</h3>
+        <p id="resultCombo">0</p>
+      </div>
+
+      <div class="card">
+        <h3>🏆 Best Score</h3>
+        <p id="resultBest">0</p>
+      </div>
+
+    </div>
+
+    <div class="resultButtons">
+      <button class="primary" onclick="startGame()">PLAY AGAIN</button>
+      <button class="smallBtn" onclick="showScreen('lobbyScreen');updateUI()">
+        RETURN TO LOBBY
+      </button>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ADMIN -->
+<section id="adminScreen" class="screen center">
+  <div class="panel">
+
+    <div class="header">
+      <div>
+        <h1>🛠️ DEVELOPER CENTER</h1>
+        <p class="subtitle" style="text-align:left">
+          Local development tools
+        </p>
+      </div>
+    </div>
+
+    <div class="notice">
+      ⚠️ This is client-side only.
+      The password is visible in the source code and is NOT a secure authentication system.
+    </div>
+
+    <div class="adminGrid">
+
+      <div class="adminBox">
+        <h3>🪙 Coins</h3>
+
+        <button class="smallBtn" onclick="adminCoins(100)">
+          +100
+        </button>
+
+        <br><br>
+
+        <button class="smallBtn" onclick="adminCoins(1000)">
+          +1,000
+        </button>
+
+        <br><br>
+
+        <button class="smallBtn" onclick="adminCoins(10000)">
+          +10,000
+        </button>
+
+        <br><br>
+
+        <button class="smallBtn" onclick="adminCoins(1000000)">
+          +1,000,000
+        </button>
+
+        <br><br>
+
+        <input id="exactCoins" type="number" placeholder="Exact coins">
+
+        <button class="smallBtn" onclick="setExactCoins()">
+          SET COINS
+        </button>
+      </div>
+
+
+      <div class="adminBox">
+        <h3>🦸 Unlocks</h3>
+
+        <button class="smallBtn" onclick="unlockAllHeroes()">
+          UNLOCK ALL HEROES
+        </button>
+
+        <br><br>
+
+        <button class="smallBtn" onclick="unlockAllAccessories()">
+          UNLOCK ALL ACCESSORIES
+        </button>
+
+        <br><br>
+
+        <button class="smallBtn" onclick="unlockAllBadges()">
+          UNLOCK ALL BADGES
+        </button>
+      </div>
+
+
+      <div class="adminBox">
+        <h3>📈 Records</h3>
+
+        <input id="adminScore" type="number" placeholder="Set best score">
+
+        <button class="smallBtn" onclick="setAdminScore()">
+          SET BEST SCORE
+        </button>
+
+        <br><br>
+
+        <input id="adminCombo" type="number" placeholder="Set best combo">
+
+        <button class="smallBtn" onclick="setAdminCombo()">
+          SET BEST COMBO
+        </button>
+      </div>
+
+
+      <div class="adminBox">
+        <h3>⚙️ Game Settings</h3>
+
+        <label style="color:#aebfdd;font-size:13px">
+          Coin multiplier
+        </label>
+
+        <input id="coinMultiplier" type="number" min="1" step=".5">
+
+        <button class="smallBtn" onclick="saveAdminSettings()">
+          SAVE SETTINGS
+        </button>
+
+        <br><br>
+
+        <label style="color:#aebfdd;font-size:13px">
+          Round duration
+        </label>
+
+        <input id="roundDuration" type="number" min="5">
+
+        <button class="smallBtn" onclick="saveAdminSettings()">
+          SAVE DURATION
+        </button>
+      </div>
+
+
+      <div class="adminBox">
+        <h3>☢️ Reset</h3>
+
+        <button class="smallBtn adminDanger" onclick="hardReset()">
+          DELETE ALL PROGRESS
+        </button>
+      </div>
+
+    </div>
+
+    <div class="nav">
+      <button onclick="showScreen('lobbyScreen');updateUI()">
+        ← Exit Admin
+      </button>
+    </div>
+
+  </div>
+</section>
+
 
 <script>
 
-    // =====================================================
-    // SETUP
-    // =====================================================
+/* =========================================================
+   DATA
+========================================================= */
 
-    const canvas = document.getElementById("game");
-    const ctx = canvas.getContext("2d");
+const HEROES = [
 
-    let gameState = "playing";
+  {
+    id:"rookie",
+    name:"Rookie Hero",
+    price:0,
+    icon:"🧑‍🚀",
+    description:"The original catcher. Simple, reliable and ready.",
+    color:"#4c8dff"
+  },
 
-    const GAME_TIME = 30;
+  {
+    id:"web",
+    name:"Web Hero",
+    price:250,
+    icon:"🕸️",
+    description:"A fast urban hero with a red-black web aesthetic.",
+    color:"#ef3340"
+  },
 
-    let timeLeft = GAME_TIME;
-    let score = 0;
-    let combo = 0;
+  {
+    id:"shield",
+    name:"Shield Hero",
+    price:500,
+    icon:"🛡️",
+    description:"A disciplined guardian built around a circular shield.",
+    color:"#438cff"
+  },
 
-    let stars = [];
-    let bombs = [];
+  {
+    id:"tech",
+    name:"Tech Hero",
+    price:750,
+    icon:"🤖",
+    description:"A futuristic armored hero with glowing technology.",
+    color:"#e44c55"
+  },
 
-    let lastTime = performance.now();
-    let spawnTimer = 0;
+  {
+    id:"thunder",
+    name:"Thunderborn",
+    price:1200,
+    icon:"⚡",
+    description:"Storm-powered warrior carrying an ancient energy hammer.",
+    color:"#7aa9ff"
+  },
 
-    let animationTime = 0;
+  {
+    id:"night",
+    name:"Night Sentinel",
+    price:1500,
+    icon:"🦇",
+    description:"A stealth-focused urban vigilante with a flowing cape.",
+    color:"#5b5f89"
+  },
+
+  {
+    id:"velocity",
+    name:"Velocity Hero",
+    price:1800,
+    icon:"💨",
+    description:"A speed-focused hero surrounded by kinetic energy.",
+    color:"#ffcc43"
+  },
+
+  {
+    id:"mystery",
+    name:"Chaos Merc",
+    price:3000,
+    icon:"🎭",
+    description:"A mysterious masked mercenary with unpredictable style.",
+    color:"#d8324e"
+  }
+
+];
 
 
-    // =====================================================
-    // PLAYER
-    // =====================================================
+const ACCESSORIES = [
 
-    const player = {
-        x: 275,
-        y: 690,
-        width: 70,
-        height: 90,
-        speed: 360
-    };
+  {
+    id:"webmask",
+    name:"Web Mask",
+    price:300,
+    icon:"🕸️",
+    desc:"Red-black web-pattern mask."
+  },
+
+  {
+    id:"guardianhelmet",
+    name:"Guardian Helmet",
+    price:350,
+    icon:"⛑️",
+    desc:"Classic soldier-style protective helmet."
+  },
+
+  {
+    id:"shield",
+    name:"Energy Shield",
+    price:600,
+    icon:"🛡️",
+    desc:"Circular defensive shield."
+  },
+
+  {
+    id:"techvisor",
+    name:"Tech Visor",
+    price:500,
+    icon:"🥽",
+    desc:"Futuristic glowing visor."
+  },
+
+  {
+    id:"hammer",
+    name:"Thunder Hammer",
+    price:750,
+    icon:"🔨",
+    desc:"Storm-charged energy hammer."
+  },
+
+  {
+    id:"cape",
+    name:"Night Cape",
+    price:650,
+    icon:"🧥",
+    desc:"Flowing dark cape."
+  },
+
+  {
+    id:"speedtrail",
+    name:"Velocity Trail",
+    price:800,
+    icon:"💨",
+    desc:"Leaves kinetic light streaks."
+  },
+
+  {
+    id:"mercmask",
+    name:"Merc Mask",
+    price:900,
+    icon:"🎭",
+    desc:"Mysterious tactical mask."
+  },
+
+  {
+    id:"energyAura",
+    name:"Energy Aura",
+    price:1000,
+    icon:"✨",
+    desc:"Subtle energy glow around the hero."
+  }
+
+];
 
 
-    // =====================================================
-    // KEYBOARD
-    // =====================================================
+const BADGES = [
 
-    const keys = {};
+  {
+    id:"firstCatch",
+    icon:"⭐",
+    name:"First Catch",
+    desc:"Catch your first star.",
+    reward:25
+  },
 
-    document.addEventListener("keydown", function(event) {
+  {
+    id:"collector",
+    icon:"🌟",
+    name:"Star Collector",
+    desc:"Catch 50 stars.",
+    reward:50
+  },
 
-        keys[event.key] = true;
+  {
+    id:"comboMaster",
+    icon:"🔥",
+    name:"Combo Master",
+    desc:"Reach a 10x combo.",
+    reward:75
+  },
 
-        if (
-            event.key === "ArrowLeft" ||
-            event.key === "ArrowRight" ||
-            event.key === " "
-        ) {
-            event.preventDefault();
+  {
+    id:"cometChaser",
+    icon:"☄️",
+    name:"Comet Chaser",
+    desc:"Catch 10 blue comets.",
+    reward:75
+  },
+
+  {
+    id:"bombDodger",
+    icon:"💣",
+    name:"Bomb Dodger",
+    desc:"Finish a round without hitting a bomb.",
+    reward:100
+  },
+
+  {
+    id:"master",
+    icon:"👑",
+    name:"Master Catcher",
+    desc:"Score 45 or more.",
+    reward:150
+  },
+
+  {
+    id:"speedDemon",
+    icon:"💨",
+    name:"Speed Demon",
+    desc:"Reach 15x combo.",
+    reward:150
+  },
+
+  {
+    id:"goldHunter",
+    icon:"🟡",
+    name:"Gold Hunter",
+    desc:"Catch 5 golden stars.",
+    reward:125
+  },
+
+  {
+    id:"legend",
+    icon:"🏆",
+    name:"Legend",
+    desc:"Score 75 or more.",
+    reward:250
+  }
+
+];
+
+
+/* =========================================================
+   MISSIONS
+========================================================= */
+
+const MISSION_POOL = [
+
+  {
+    id:"m1",
+    text:"Catch 25 objects",
+    target:25,
+    type:"objects",
+    reward:40
+  },
+
+  {
+    id:"m2",
+    text:"Reach a 5x combo",
+    target:5,
+    type:"combo",
+    reward:40
+  },
+
+  {
+    id:"m3",
+    text:"Catch 3 comets",
+    target:3,
+    type:"comets",
+    reward:50
+  },
+
+  {
+    id:"m4",
+    text:"Score 30 points",
+    target:30,
+    type:"score",
+    reward:60
+  },
+
+  {
+    id:"m5",
+    text:"Catch 2 golden stars",
+    target:2,
+    type:"gold",
+    reward:75
+  },
+
+  {
+    id:"m6",
+    text:"Finish a round without a bomb",
+    target:1,
+    type:"noBomb",
+    reward:80
+  },
+
+  {
+    id:"m7",
+    text:"Reach a 10x combo",
+    target:10,
+    type:"combo",
+    reward:100
+  }
+
+];
+
+
+/* =========================================================
+   SAVE
+========================================================= */
+
+const SAVE_KEY = "tryCatchMe_v2";
+
+let save = JSON.parse(localStorage.getItem(SAVE_KEY) || "null");
+
+if(!save){
+
+  save = {
+
+    name:"",
+
+    coins:0,
+
+    selectedHero:"rookie",
+
+    ownedHeroes:["rookie"],
+
+    ownedAccessories:[],
+
+    equippedAccessories:[],
+
+    unlockedBadges:[],
+
+    highScore:0,
+
+    bestCombo:0,
+
+    totalStars:0,
+
+    totalComets:0,
+
+    totalGold:0,
+
+    rounds:0,
+
+    missions:[],
+
+    settings:{
+      coinMultiplier:1,
+      roundDuration:30
+    }
+
+  };
+
+}
+
+function persist(){
+
+  localStorage.setItem(
+    SAVE_KEY,
+    JSON.stringify(save)
+  );
+
+}
+
+
+/* =========================================================
+   UI
+========================================================= */
+
+function showScreen(id){
+
+  document
+    .querySelectorAll(".screen")
+    .forEach(s=>s.classList.remove("active"));
+
+  document
+    .getElementById(id)
+    .classList.add("active");
+
+}
+
+
+function updateUI(){
+
+  document.getElementById("playerName").textContent =
+    save.name || "Hero";
+
+  document.getElementById("coinDisplay").textContent =
+    save.coins;
+
+  document.getElementById("badgeDisplay").textContent =
+    save.unlockedBadges.length;
+
+  document.getElementById("bestDisplay").textContent =
+    save.highScore;
+
+  document.getElementById("heroCoins").textContent =
+    save.coins;
+
+  document.getElementById("accessoryCoins").textContent =
+    save.coins;
+
+}
+
+
+function startProfile(){
+
+  const name =
+    document
+      .getElementById("nameInput")
+      .value
+      .trim();
+
+  if(!name){
+
+    alert("Enter your hero name first!");
+
+    return;
+
+  }
+
+  save.name = name;
+
+  if(!save.missions.length){
+
+    generateMissions();
+
+  }
+
+  persist();
+
+  updateUI();
+
+  showScreen("lobbyScreen");
+
+}
+
+
+if(save.name){
+
+  updateUI();
+
+  showScreen("lobbyScreen");
+
+}
+
+
+/* =========================================================
+   HERO SHOP
+========================================================= */
+
+function renderHeroes(){
+
+  const grid =
+    document.getElementById("heroGrid");
+
+  grid.innerHTML = "";
+
+  HEROES.forEach(hero=>{
+
+    const owned =
+      save.ownedHeroes.includes(hero.id);
+
+    const equipped =
+      save.selectedHero === hero.id;
+
+    grid.innerHTML += `
+
+      <div class="card">
+
+        <div class="heroPreview">
+          <div
+            class="heroEmoji"
+            style="text-shadow:0 0 25px ${hero.color}"
+          >
+            ${hero.icon}
+          </div>
+        </div>
+
+        <span class="tag">
+          ${hero.id==="rookie" ? "STARTER" : "HERO"}
+        </span>
+
+        <h3>${hero.name}</h3>
+
+        <p>${hero.description}</p>
+
+        <div class="price">
+          ${hero.price===0 ? "FREE" : "🪙 "+hero.price}
+        </div>
+
+        ${
+          owned
+
+          ?
+
+          `<button
+             class="smallBtn ${equipped?"equipped":""}"
+             onclick="equipHero('${hero.id}')">
+             ${equipped?"✓ EQUIPPED":"EQUIP"}
+           </button>`
+
+          :
+
+          `<button
+             class="smallBtn"
+             onclick="buyHero('${hero.id}')"
+             ${save.coins<hero.price?"disabled":""}>
+             BUY
+           </button>`
         }
 
-        // Restart after game over
-        if (event.key === " " && gameState === "gameover") {
-            restartGame();
+      </div>
+
+    `;
+
+  });
+
+}
+
+
+function buyHero(id){
+
+  const hero =
+    HEROES.find(h=>h.id===id);
+
+  if(!hero) return;
+
+  if(save.ownedHeroes.includes(id)){
+
+    equipHero(id);
+
+    return;
+
+  }
+
+  if(save.coins < hero.price){
+
+    alert("Not enough coins!");
+
+    return;
+
+  }
+
+  save.coins -= hero.price;
+
+  save.ownedHeroes.push(id);
+
+  save.selectedHero = id;
+
+  persist();
+
+  renderHeroes();
+
+  updateUI();
+
+}
+
+
+function equipHero(id){
+
+  if(!save.ownedHeroes.includes(id)) return;
+
+  save.selectedHero = id;
+
+  persist();
+
+  renderHeroes();
+
+  updateUI();
+
+}
+
+
+/* =========================================================
+   ACCESSORIES
+========================================================= */
+
+function renderAccessories(){
+
+  const grid =
+    document.getElementById("accessoryGrid");
+
+  grid.innerHTML = "";
+
+  ACCESSORIES.forEach(item=>{
+
+    const owned =
+      save.ownedAccessories.includes(item.id);
+
+    const equipped =
+      save.equippedAccessories.includes(item.id);
+
+    grid.innerHTML += `
+
+      <div class="card">
+
+        <div class="bigIcon">
+          ${item.icon}
+        </div>
+
+        <span class="tag">
+          COSMETIC
+        </span>
+
+        <h3>${item.name}</h3>
+
+        <p>${item.desc}</p>
+
+        <div class="price">
+          🪙 ${item.price}
+        </div>
+
+        ${
+          owned
+
+          ?
+
+          `<button
+             class="smallBtn ${equipped?"equipped":""}"
+             onclick="toggleAccessory('${item.id}')">
+             ${equipped?"✓ EQUIPPED":"EQUIP"}
+           </button>`
+
+          :
+
+          `<button
+             class="smallBtn"
+             onclick="buyAccessory('${item.id}')">
+             BUY
+           </button>`
         }
+
+      </div>
+
+    `;
+
+  });
+
+}
+
+
+function buyAccessory(id){
+
+  const item =
+    ACCESSORIES.find(a=>a.id===id);
+
+  if(!item) return;
+
+  if(save.ownedAccessories.includes(id)){
+
+    toggleAccessory(id);
+
+    return;
+
+  }
+
+  if(save.coins < item.price){
+
+    alert("Not enough coins!");
+
+    return;
+
+  }
+
+  save.coins -= item.price;
+
+  save.ownedAccessories.push(id);
+
+  save.equippedAccessories.push(id);
+
+  persist();
+
+  renderAccessories();
+
+  updateUI();
+
+}
+
+
+function toggleAccessory(id){
+
+  if(!save.ownedAccessories.includes(id)) return;
+
+  if(save.equippedAccessories.includes(id)){
+
+    save.equippedAccessories =
+      save.equippedAccessories.filter(
+        x=>x!==id
+      );
+
+  }else{
+
+    save.equippedAccessories.push(id);
+
+  }
+
+  persist();
+
+  renderAccessories();
+
+}
+
+
+/* =========================================================
+   BADGES
+========================================================= */
+
+function renderBadges(){
+
+  const grid =
+    document.getElementById("badgeGrid");
+
+  grid.innerHTML = "";
+
+  BADGES.forEach(badge=>{
+
+    const unlocked =
+      save.unlockedBadges.includes(badge.id);
+
+    grid.innerHTML += `
+
+      <div class="card ${
+        unlocked ? "" : "lockedOverlay"
+      }">
+
+        <div class="badgeIcon">
+          ${unlocked ? badge.icon : "🔒"}
+        </div>
+
+        <span class="tag">
+          ${unlocked?"UNLOCKED":"LOCKED"}
+        </span>
+
+        <h3>${badge.name}</h3>
+
+        <p>${badge.desc}</p>
+
+        <div class="price">
+          Reward: 🪙 ${badge.reward}
+        </div>
+
+      </div>
+
+    `;
+
+  });
+
+}
+
+
+/* =========================================================
+   MISSIONS
+========================================================= */
+
+function generateMissions(){
+
+  const shuffled =
+    [...MISSION_POOL]
+      .sort(()=>Math.random()-.5);
+
+  save.missions =
+    shuffled
+      .slice(0,3)
+      .map(m=>({
+
+        ...m,
+        progress:0,
+        complete:false
+
+      }));
+
+  persist();
+
+}
+
+
+function renderMissions(){
+
+  if(!save.missions.length)
+    generateMissions();
+
+  const grid =
+    document.getElementById("missionGrid");
+
+  grid.innerHTML = "";
+
+  save.missions.forEach(m=>{
+
+    const pct =
+      Math.min(
+        100,
+        (m.progress/m.target)*100
+      );
+
+    grid.innerHTML += `
+
+      <div class="card mission">
+
+        <span class="tag">
+          ${m.complete?"COMPLETE":"MISSION"}
+        </span>
+
+        <h3>${m.text}</h3>
+
+        <div class="progress">
+          <div style="width:${pct}%"></div>
+        </div>
+
+        <p>
+          ${Math.min(m.progress,m.target)}
+          /
+          ${m.target}
+        </p>
+
+        <div class="price">
+          Reward: 🪙 ${m.reward}
+        </div>
+
+      </div>
+
+    `;
+
+  });
+
+}
+
+
+function updateMission(type,value){
+
+  save.missions.forEach(m=>{
+
+    if(m.complete) return;
+
+    if(m.type!==type) return;
+
+    m.progress =
+      Math.max(m.progress,value);
+
+    if(m.progress>=m.target){
+
+      m.complete=true;
+
+      save.coins += m.reward;
+
+    }
+
+  });
+
+}
+
+
+/* =========================================================
+   GAME
+========================================================= */
+
+const canvas =
+  document.getElementById("gameCanvas");
+
+const ctx =
+  canvas.getContext("2d");
+
+let game = null;
+
+const keys = {
+  left:false,
+  right:false
+};
+
+
+function startGame(){
+
+  showScreen("gameScreen");
+
+  game = {
+
+    running:true,
+
+    time:save.settings.roundDuration,
+
+    score:0,
+
+    combo:0,
+
+    bestComboRound:0,
+
+    stars:0,
+
+    comets:0,
+
+    gold:0,
+
+    objects:[],
+
+    particles:[],
+
+    texts:[],
+
+    player:{
+      x:300,
+      y:720,
+      width:100,
+      speed:8
+    },
+
+    spawnTimer:0,
+
+    elapsed:0,
+
+    bombHit:false,
+
+    frenzy:false,
+
+    frenzyTimer:0,
+
+    screenShake:0
+
+  };
+
+  lastTime = performance.now();
+
+  requestAnimationFrame(gameLoop);
+
+}
+
+
+let lastTime = 0;
+
+
+function gameLoop(now){
+
+  if(!game || !game.running) return;
+
+  const dt =
+    Math.min(
+      40,
+      now-lastTime
+    );
+
+  lastTime = now;
+
+  updateGame(dt);
+
+  drawGame();
+
+  requestAnimationFrame(gameLoop);
+
+}
+
+
+/* =========================================================
+   GAME UPDATE
+========================================================= */
+
+function updateGame(dt){
+
+  const sec =
+    dt/1000;
+
+  game.elapsed += sec;
+
+  game.time -= sec;
+
+  if(game.time<=0){
+
+    endGame();
+
+    return;
+
+  }
+
+  if(keys.left)
+    game.player.x -= game.player.speed;
+
+  if(keys.right)
+    game.player.x += game.player.speed;
+
+  game.player.x =
+    Math.max(
+      50,
+      Math.min(
+        550,
+        game.player.x
+      )
+    );
+
+
+  /* spawn */
+
+  game.spawnTimer -= dt;
+
+  const difficulty =
+    1 +
+    Math.min(
+      2.4,
+      game.elapsed/12
+    );
+
+  if(game.spawnTimer<=0){
+
+    spawnObject(difficulty);
+
+    game.spawnTimer =
+      Math.max(
+        220,
+        620/difficulty
+      );
+
+  }
+
+
+  /* objects */
+
+  for(let i=game.objects.length-1;i>=0;i--){
+
+    const o =
+      game.objects[i];
+
+    o.y += o.speed * sec;
+
+    if(o.type==="bomb" && o.moving){
+
+      o.x +=
+        Math.sin(
+          game.elapsed*4+o.seed
+        ) * 2;
+
+    }
+
+    if(
+      o.y >
+      canvas.height+60
+    ){
+
+      game.objects.splice(i,1);
+
+      continue;
+
+    }
+
+
+    /* collision */
+
+    const dx =
+      Math.abs(
+        o.x-game.player.x
+      );
+
+    const dy =
+      Math.abs(
+        o.y-game.player.y
+      );
+
+    if(
+      dx < 55 &&
+      dy < 55
+    ){
+
+      collectObject(o);
+
+      game.objects.splice(i,1);
+
+    }
+
+  }
+
+
+  /* particles */
+
+  game.particles.forEach(p=>{
+
+    p.x += p.vx*sec;
+    p.y += p.vy*sec;
+    p.vy += 120*sec;
+    p.life -= sec;
+
+  });
+
+  game.particles =
+    game.particles.filter(
+      p=>p.life>0
+    );
+
+
+  /* floating text */
+
+  game.texts.forEach(t=>{
+
+    t.y -= 30*sec;
+    t.life -= sec;
+
+  });
+
+  game.texts =
+    game.texts.filter(
+      t=>t.life>0
+    );
+
+
+  /* frenzy */
+
+  if(game.frenzy){
+
+    game.frenzyTimer -= sec;
+
+    if(game.frenzyTimer<=0){
+
+      game.frenzy=false;
+
+      document
+        .getElementById("frenzyBanner")
+        .classList.remove("show");
+
+    }
+
+  }
+
+
+  if(game.screenShake>0)
+    game.screenShake -= sec;
+
+
+  updateGameUI();
+
+}
+
+
+/* =========================================================
+   SPAWN
+========================================================= */
+
+function spawnObject(difficulty){
+
+  const r=Math.random();
+
+  let type;
+
+  if(r<.045){
+
+    type="gold";
+
+  }else if(r<.13){
+
+    type="comet";
+
+  }else if(r<.28){
+
+    type="red";
+
+  }else if(r<.42){
+
+    type="bomb";
+
+  }else{
+
+    type="yellow";
+
+  }
+
+
+  let speed =
+    160 +
+    Math.random()*110;
+
+  speed *= difficulty;
+
+
+  if(game.frenzy)
+    speed *= 1.15;
+
+
+  game.objects.push({
+
+    type,
+
+    x:
+      40+
+      Math.random()*520,
+
+    y:-40,
+
+    speed,
+
+    size:
+      type==="gold"
+      ? 25
+      : 20,
+
+    rotation:
+      Math.random()*Math.PI*2,
+
+    seed:
+      Math.random()*10,
+
+    moving:
+      type==="bomb" &&
+      Math.random()<.4
+
+  });
+
+}
+
+
+/* =========================================================
+   COLLECTION
+========================================================= */
+
+function collectObject(o){
+
+  let points=0;
+
+  if(o.type==="bomb"){
+
+    points=-2;
+
+    game.score =
+      Math.max(
+        0,
+        game.score+points
+      );
+
+    game.combo=0;
+
+    game.bombHit=true;
+
+    game.screenShake=.25;
+
+    addParticles(
+      o.x,
+      o.y,
+      "#ff404f",
+      18
+    );
+
+    addText(
+      o.x,
+      o.y,
+      "-2",
+      "#ff6571"
+    );
+
+  }
+
+  else{
+
+    if(o.type==="yellow"){
+
+      points=1;
+      game.stars++;
+
+    }
+
+    if(o.type==="red"){
+
+      points=2;
+      game.stars++;
+
+    }
+
+    if(o.type==="comet"){
+
+      points=3;
+      game.comets++;
+
+    }
+
+    if(o.type==="gold"){
+
+      points=5;
+      game.gold++;
+
+      game.screenShake=.12;
+
+    }
+
+
+    game.combo++;
+
+    game.bestComboRound =
+      Math.max(
+        game.bestComboRound,
+        game.combo
+      );
+
+
+    let multiplier =
+      1 +
+      Math.floor(game.combo/5)*0.25;
+
+    if(game.frenzy)
+      multiplier *= 2;
+
+
+    const gained =
+      Math.round(
+        points*multiplier
+      );
+
+    game.score += gained;
+
+
+    addParticles(
+      o.x,
+      o.y,
+      o.type==="gold"
+      ? "#ffd83d"
+      : "#70c7ff",
+      o.type==="gold"?28:12
+    );
+
+
+    addText(
+      o.x,
+      o.y,
+      "+"+gained,
+      o.type==="gold"
+      ? "#ffd83d"
+      : "#ffffff"
+    );
+
+
+    if(game.combo>=10 && !game.frenzy){
+
+      activateFrenzy();
+
+    }
+
+  }
+
+
+  updateMission(
+    "objects",
+    game.stars+
+    game.comets+
+    game.gold
+  );
+
+  updateMission(
+    "combo",
+    game.bestComboRound
+  );
+
+  updateMission(
+    "comets",
+    game.comets
+  );
+
+  updateMission(
+    "gold",
+    game.gold
+  );
+
+  updateMission(
+    "score",
+    game.score
+  );
+
+  persist();
+
+}
+
+
+/* =========================================================
+   FRENZY
+========================================================= */
+
+function activateFrenzy(){
+
+  game.frenzy=true;
+
+  game.frenzyTimer=5;
+
+  document
+    .getElementById("frenzyBanner")
+    .classList.add("show");
+
+}
+
+
+/* =========================================================
+   EFFECTS
+========================================================= */
+
+function addParticles(x,y,color,count){
+
+  for(let i=0;i<count;i++){
+
+    const angle =
+      Math.random()*Math.PI*2;
+
+    const speed =
+      60+
+      Math.random()*180;
+
+    game.particles.push({
+
+      x,
+      y,
+
+      vx:
+        Math.cos(angle)*speed,
+
+      vy:
+        Math.sin(angle)*speed,
+
+      life:
+        .35+
+        Math.random()*.4,
+
+      size:
+        2+
+        Math.random()*4,
+
+      color
+
     });
 
-    document.addEventListener("keyup", function(event) {
-        keys[event.key] = false;
-    });
+  }
+
+}
 
 
-    // =====================================================
-    // CREATE STAR
-    // =====================================================
+function addText(x,y,text,color){
 
-    function createStar(type) {
+  game.texts.push({
 
-        let size;
-        let speed;
+    x,
+    y,
+    text,
+    color,
+    life:1
 
-        if (type === "yellow") {
-            size = 18;
-            speed = 180;
-        }
+  });
 
-        if (type === "red") {
-            size = 21;
-            speed = 220;
-        }
+}
 
-        if (type === "blue") {
-            size = 23;
-            speed = 280;
-        }
 
-        stars.push({
-            x: Math.random() * (canvas.width - 40) + 20,
-            y: -30,
-            size: size,
-            speed: speed,
-            type: type,
-            rotation: Math.random() * Math.PI
-        });
+/* =========================================================
+   DRAW GAME
+========================================================= */
+
+function drawGame(){
+
+  let shakeX=0;
+  let shakeY=0;
+
+  if(game.screenShake>0){
+
+    shakeX =
+      (Math.random()-.5)*12;
+
+    shakeY =
+      (Math.random()-.5)*12;
+
+  }
+
+  ctx.save();
+
+  ctx.translate(
+    shakeX,
+    shakeY
+  );
+
+  drawBackground();
+
+  drawObjects();
+
+  drawPlayer();
+
+  drawParticles();
+
+  drawTexts();
+
+  ctx.restore();
+
+}
+
+
+function drawBackground(){
+
+  const g =
+    ctx.createLinearGradient(
+      0,0,
+      0,canvas.height
+    );
+
+  g.addColorStop(
+    0,
+    game.frenzy
+      ? "#321b48"
+      : "#071126"
+  );
+
+  g.addColorStop(
+    .5,
+    game.frenzy
+      ? "#24173c"
+      : "#0a1834"
+  );
+
+  g.addColorStop(
+    1,
+    "#02050e"
+  );
+
+  ctx.fillStyle=g;
+
+  ctx.fillRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+
+  /* stars */
+
+  for(let i=0;i<90;i++){
+
+    const x =
+      (i*83)%600;
+
+    const y =
+      (i*137)%800;
+
+    const twinkle =
+      .3+
+      .25*
+      Math.sin(
+        game.elapsed*2+i
+      );
+
+    ctx.globalAlpha=twinkle;
+
+    ctx.fillStyle="#fff";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      x,
+      y,
+      1.3,
+      0,
+      Math.PI*2
+    );
+
+    ctx.fill();
+
+  }
+
+  ctx.globalAlpha=1;
+
+
+  /* horizon glow */
+
+  const glow =
+    ctx.createRadialGradient(
+      300,
+      750,
+      20,
+      300,
+      750,
+      380
+    );
+
+  glow.addColorStop(
+    0,
+    "rgba(80,140,255,.18)"
+  );
+
+  glow.addColorStop(
+    1,
+    "rgba(0,0,0,0)"
+  );
+
+  ctx.fillStyle=glow;
+
+  ctx.fillRect(
+    0,
+    400,
+    600,
+    400
+  );
+
+}
+
+
+function drawObjects(){
+
+  game.objects.forEach(o=>{
+
+    ctx.save();
+
+    ctx.translate(
+      o.x,
+      o.y
+    );
+
+    ctx.rotate(o.rotation);
+
+    if(o.type==="yellow")
+      drawStar("#ffe15c",o.size);
+
+    if(o.type==="red")
+      drawStar("#ff5368",o.size);
+
+    if(o.type==="comet")
+      drawComet();
+
+    if(o.type==="gold")
+      drawGoldenStar();
+
+    if(o.type==="bomb")
+      drawBomb();
+
+    ctx.restore();
+
+  });
+
+}
+
+
+function drawStar(color,size){
+
+  ctx.shadowBlur=18;
+  ctx.shadowColor=color;
+
+  ctx.fillStyle=color;
+
+  ctx.beginPath();
+
+  for(let i=0;i<10;i++){
+
+    const angle =
+      -Math.PI/2+
+      i*Math.PI/5;
+
+    const radius =
+      i%2===0
+      ? size
+      : size*.42;
+
+    const x=
+      Math.cos(angle)*radius;
+
+    const y=
+      Math.sin(angle)*radius;
+
+    if(i===0)
+      ctx.moveTo(x,y);
+    else
+      ctx.lineTo(x,y);
+
+  }
+
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.shadowBlur=0;
+
+}
+
+
+function drawGoldenStar(){
+
+  drawStar("#ffd43b",27);
+
+  ctx.strokeStyle="#fff4a6";
+  ctx.lineWidth=2;
+
+  ctx.beginPath();
+
+  ctx.arc(
+    0,
+    0,
+    32,
+    0,
+    Math.PI*2
+  );
+
+  ctx.stroke();
+
+}
+
+
+function drawComet(){
+
+  ctx.shadowBlur=20;
+  ctx.shadowColor="#55c8ff";
+
+  const gradient =
+    ctx.createLinearGradient(
+      -55,
+      0,
+      20,
+      0
+    );
+
+  gradient.addColorStop(
+    0,
+    "rgba(70,190,255,0)"
+  );
+
+  gradient.addColorStop(
+    .7,
+    "rgba(70,190,255,.7)"
+  );
+
+  gradient.addColorStop(
+    1,
+    "#d8f7ff"
+  );
+
+  ctx.fillStyle=gradient;
+
+  ctx.beginPath();
+
+  ctx.moveTo(-65,5);
+  ctx.lineTo(5,-10);
+  ctx.lineTo(20,0);
+  ctx.lineTo(5,10);
+
+  ctx.closePath();
+
+  ctx.fill();
+
+  ctx.fillStyle="#c9f4ff";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    18,
+    0,
+    12,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+  ctx.shadowBlur=0;
+
+}
+
+
+function drawBomb(){
+
+  ctx.shadowBlur=15;
+  ctx.shadowColor="#ff384e";
+
+  const gradient =
+    ctx.createRadialGradient(
+      -5,-8,2,
+      0,0,24
+    );
+
+  gradient.addColorStop(
+    0,
+    "#515a6d"
+  );
+
+  gradient.addColorStop(
+    1,
+    "#111522"
+  );
+
+  ctx.fillStyle=gradient;
+
+  ctx.beginPath();
+
+  ctx.arc(
+    0,
+    5,
+    22,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+  ctx.strokeStyle="#080b12";
+  ctx.lineWidth=3;
+
+  ctx.stroke();
+
+  ctx.strokeStyle="#ffb52d";
+  ctx.lineWidth=5;
+
+  ctx.beginPath();
+
+  ctx.moveTo(8,-14);
+  ctx.quadraticCurveTo(
+    18,-28,
+    27,-20
+  );
+
+  ctx.stroke();
+
+  ctx.shadowBlur=0;
+
+}
+
+
+/* =========================================================
+   PLAYER
+========================================================= */
+
+function drawPlayer(){
+
+  const x =
+    game.player.x;
+
+  const y =
+    game.player.y;
+
+  const hero =
+    save.selectedHero;
+
+  ctx.save();
+
+  ctx.translate(x,y);
+
+
+  /* aura */
+
+  if(
+    save.equippedAccessories
+      .includes("energyAura")
+  ){
+
+    const aura =
+      ctx.createRadialGradient(
+        0,0,10,
+        0,0,75
+      );
+
+    aura.addColorStop(
+      0,
+      "rgba(90,190,255,.25)"
+    );
+
+    aura.addColorStop(
+      1,
+      "rgba(90,190,255,0)"
+    );
+
+    ctx.fillStyle=aura;
+
+    ctx.beginPath();
+
+    ctx.arc(
+      0,
+      0,
+      75,
+      0,
+      Math.PI*2
+    );
+
+    ctx.fill();
+
+  }
+
+
+  /* cape */
+
+  if(
+    save.equippedAccessories
+      .includes("cape") ||
+    hero==="night"
+  ){
+
+    ctx.fillStyle="#171a31";
+
+    ctx.beginPath();
+
+    ctx.moveTo(-35,-20);
+    ctx.quadraticCurveTo(
+      -75,
+      25,
+      -48,
+      82
+    );
+
+    ctx.lineTo(0,55);
+    ctx.lineTo(45,82);
+
+    ctx.quadraticCurveTo(
+      75,
+      25,
+      35,-20
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
+
+    ctx.strokeStyle="#363b64";
+    ctx.lineWidth=2;
+
+    ctx.stroke();
+
+  }
+
+
+  /* legs */
+
+  const legGradient =
+    ctx.createLinearGradient(
+      -30,
+      20,
+      30,
+      90
+    );
+
+  legGradient.addColorStop(
+    0,
+    "#273552"
+  );
+
+  legGradient.addColorStop(
+    1,
+    "#0d1424"
+  );
+
+  ctx.fillStyle=legGradient;
+
+  roundRect(
+    ctx,
+    -32,
+    32,
+    25,
+    55,
+    8
+  );
+
+  roundRect(
+    ctx,
+    7,
+    32,
+    25,
+    55,
+    8
+  );
+
+
+  /* boots */
+
+  ctx.fillStyle="#080c16";
+
+  roundRect(
+    ctx,
+    -36,
+    73,
+    31,
+    17,
+    7
+  );
+
+  roundRect(
+    ctx,
+    5,
+    73,
+    31,
+    17,
+    7
+  );
+
+
+  /* body */
+
+  let body1="#426baf";
+  let body2="#182742";
+
+
+  if(hero==="web"){
+
+    body1="#b72c42";
+    body2="#301525";
+
+  }
+
+  if(hero==="shield"){
+
+    body1="#3f78cf";
+    body2="#16294c";
+
+  }
+
+  if(hero==="tech"){
+
+    body1="#c94a51";
+    body2="#3c1820";
+
+  }
+
+  if(hero==="thunder"){
+
+    body1="#596fbc";
+    body2="#252b57";
+
+  }
+
+  if(hero==="night"){
+
+    body1="#343750";
+    body2="#11131f";
+
+  }
+
+  if(hero==="velocity"){
+
+    body1="#d7a62f";
+    body2="#493818";
+
+  }
+
+  if(hero==="mystery"){
+
+    body1="#a82d43";
+    body2="#241422";
+
+  }
+
+
+  const bodyGradient =
+    ctx.createLinearGradient(
+      -40,
+      -30,
+      40,
+      60
+    );
+
+  bodyGradient.addColorStop(
+    0,
+    body1
+  );
+
+  bodyGradient.addColorStop(
+    .5,
+    body2
+  );
+
+  bodyGradient.addColorStop(
+    1,
+    "#080d19"
+  );
+
+  ctx.fillStyle=bodyGradient;
+
+  roundRect(
+    ctx,
+    -40,
+    -35,
+    80,
+    82,
+    19
+  );
+
+
+  /* armor highlights */
+
+  ctx.strokeStyle=
+    "rgba(255,255,255,.18)";
+
+  ctx.lineWidth=2;
+
+  ctx.beginPath();
+
+  ctx.moveTo(-25,-27);
+  ctx.lineTo(-20,25);
+
+  ctx.moveTo(25,-27);
+  ctx.lineTo(20,25);
+
+  ctx.stroke();
+
+
+  /* chest emblem */
+
+  ctx.fillStyle="#e8f5ff";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    0,
+    -2,
+    12,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+
+  ctx.fillStyle=
+    hero==="velocity"
+    ? "#e3a832"
+    : "#457dff";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    0,
+    -2,
+    7,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+
+  /* arms */
+
+  ctx.fillStyle=body2;
+
+  roundRect(
+    ctx,
+    -58,
+    -28,
+    22,
+    58,
+    10
+  );
+
+  roundRect(
+    ctx,
+    36,
+    -28,
+    22,
+    58,
+    10
+  );
+
+
+  /* gloves */
+
+  ctx.fillStyle="#111827";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    -47,
+    34,
+    11,
+    0,
+    Math.PI*2
+  );
+
+  ctx.arc(
+    47,
+    34,
+    11,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+
+  /* head */
+
+  const headGradient =
+    ctx.createRadialGradient(
+      -7,
+      -58,
+      3,
+      0,
+      -53,
+      27
+    );
+
+  headGradient.addColorStop(
+    0,
+    "#ffd7b4"
+  );
+
+  headGradient.addColorStop(
+    .7,
+    "#d59a72"
+  );
+
+  headGradient.addColorStop(
+    1,
+    "#8b5b46"
+  );
+
+  ctx.fillStyle=headGradient;
+
+  ctx.beginPath();
+
+  ctx.arc(
+    0,
+    -57,
+    27,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+
+  /* hero masks */
+
+  if(
+    hero==="web" ||
+    save.equippedAccessories
+      .includes("webmask")
+  ){
+
+    ctx.fillStyle="#a92d43";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      0,
+      -57,
+      27,
+      0,
+      Math.PI*2
+    );
+
+    ctx.fill();
+
+    ctx.strokeStyle=
+      "rgba(255,255,255,.22)";
+
+    ctx.lineWidth=1;
+
+    for(let i=0;i<6;i++){
+
+      ctx.beginPath();
+
+      ctx.moveTo(0,-57);
+
+      ctx.lineTo(
+        Math.cos(i*Math.PI/3)*25,
+        -57+
+        Math.sin(i*Math.PI/3)*25
+      );
+
+      ctx.stroke();
+
     }
 
+  }
 
-    // =====================================================
-    // CREATE BOMB
-    // =====================================================
 
-    function createBomb() {
+  if(
+    hero==="mystery" ||
+    save.equippedAccessories
+      .includes("mercmask")
+  ){
 
-        bombs.push({
-            x: Math.random() * (canvas.width - 40) + 20,
-            y: -40,
-            size: 24,
-            speed: 210,
-            rotation: 0
-        });
+    ctx.fillStyle="#1b1d27";
+
+    roundRect(
+      ctx,
+      -27,
+      -67,
+      54,
+      28,
+      10
+    );
+
+    ctx.fillStyle="#e7edf8";
+
+    ctx.fillRect(
+      -16,
+      -57,
+      10,
+      4
+    );
+
+    ctx.fillRect(
+      6,
+      -57,
+      10,
+      4
+    );
+
+  }
+
+
+  /* helmets */
+
+  if(
+    hero==="shield" ||
+    save.equippedAccessories
+      .includes("guardianhelmet")
+  ){
+
+    ctx.fillStyle="#53678b";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      0,
+      -61,
+      28,
+      Math.PI,
+      Math.PI*2
+    );
+
+    ctx.fill();
+
+    ctx.fillStyle="#e0b43c";
+
+    ctx.fillRect(
+      -3,
+      -86,
+      6,
+      25
+    );
+
+  }
+
+
+  if(
+    hero==="tech" ||
+    save.equippedAccessories
+      .includes("techvisor")
+  ){
+
+    ctx.fillStyle="#4a5366";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      0,
+      -57,
+      28,
+      0,
+      Math.PI*2
+    );
+
+    ctx.fill();
+
+    ctx.fillStyle="#63dcff";
+
+    roundRect(
+      ctx,
+      -22,
+      -63,
+      44,
+      10,
+      5
+    );
+
+  }
+
+
+  /* thunder hammer */
+
+  if(
+    hero==="thunder" ||
+    save.equippedAccessories
+      .includes("hammer")
+  ){
+
+    ctx.save();
+
+    ctx.rotate(-.3);
+
+    ctx.fillStyle="#8a6238";
+
+    ctx.fillRect(
+      58,
+      -5,
+      8,
+      65
+    );
+
+    const hg =
+      ctx.createLinearGradient(
+        50,
+        -25,
+        90,
+        5
+      );
+
+    hg.addColorStop(
+      0,
+      "#b9d8ff"
+    );
+
+    hg.addColorStop(
+      1,
+      "#485a7d"
+    );
+
+    ctx.fillStyle=hg;
+
+    roundRect(
+      ctx,
+      42,
+      -27,
+      45,
+      27,
+      7
+    );
+
+    ctx.restore();
+
+  }
+
+
+  /* shield */
+
+  if(
+    hero==="shield" ||
+    save.equippedAccessories
+      .includes("shield")
+  ){
+
+    ctx.fillStyle="#b83242";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      -60,
+      5,
+      27,
+      0,
+      Math.PI*2
+    );
+
+    ctx.fill();
+
+    ctx.strokeStyle="#e5d16a";
+    ctx.lineWidth=5;
+
+    ctx.stroke();
+
+    ctx.fillStyle="#477dce";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      -60,
+      5,
+      15,
+      0,
+      Math.PI*2
+    );
+
+    ctx.fill();
+
+  }
+
+
+  /* speed trail */
+
+  if(
+    hero==="velocity" ||
+    save.equippedAccessories
+      .includes("speedtrail")
+  ){
+
+    ctx.globalAlpha=.35;
+
+    for(let i=0;i<4;i++){
+
+      ctx.strokeStyle=
+        i%2
+        ? "#fff2a1"
+        : "#64c9ff";
+
+      ctx.lineWidth=4;
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        -45-i*8,
+        65+i*8
+      );
+
+      ctx.lineTo(
+        -80-i*20,
+        90+i*9
+      );
+
+      ctx.stroke();
+
     }
 
+    ctx.globalAlpha=1;
 
-    // =====================================================
-    // STAR SPAWNING
-    // =====================================================
+  }
 
-    function spawnObjects(deltaTime) {
 
-        spawnTimer += deltaTime;
+  ctx.restore();
 
-        // Difficulty increases as time passes
-        const difficulty = 1 + (GAME_TIME - timeLeft) / GAME_TIME;
+}
 
-        const spawnInterval = Math.max(
-            0.25,
-            0.65 - difficulty * 0.15
-        );
 
-        if (spawnTimer >= spawnInterval) {
+/* =========================================================
+   DRAW EFFECTS
+========================================================= */
 
-            spawnTimer = 0;
+function drawParticles(){
 
-            const random = Math.random();
+  game.particles.forEach(p=>{
 
-            /*
-                Yellow = 70%
-                Red    = 20%
-                Blue   = 10%
-            */
+    ctx.globalAlpha =
+      Math.max(
+        0,
+        p.life
+      );
 
-            if (random < 0.70) {
-                createStar("yellow");
-            }
+    ctx.fillStyle=p.color;
 
-            else if (random < 0.90) {
-                createStar("red");
-            }
+    ctx.beginPath();
 
-            else {
-                createStar("blue");
-            }
+    ctx.arc(
+      p.x,
+      p.y,
+      p.size,
+      0,
+      Math.PI*2
+    );
 
-            // Bomb chance increases with difficulty
-            const bombChance = 0.08 + difficulty * 0.08;
+    ctx.fill();
 
-            if (Math.random() < bombChance) {
-                createBomb();
-            }
-        }
+  });
+
+  ctx.globalAlpha=1;
+
+}
+
+
+function drawTexts(){
+
+  game.texts.forEach(t=>{
+
+    ctx.globalAlpha =
+      Math.max(
+        0,
+        t.life
+      );
+
+    ctx.fillStyle=t.color;
+
+    ctx.font=
+      "900 22px system-ui";
+
+    ctx.textAlign="center";
+
+    ctx.fillText(
+      t.text,
+      t.x,
+      t.y
+    );
+
+  });
+
+  ctx.globalAlpha=1;
+
+}
+
+
+/* =========================================================
+   GAME UI
+========================================================= */
+
+function updateGameUI(){
+
+  document
+    .getElementById("timeDisplay")
+    .textContent =
+      Math.max(
+        0,
+        Math.ceil(game.time)
+      );
+
+  document
+    .getElementById("scoreDisplay")
+    .textContent =
+      game.score;
+
+  document
+    .getElementById("comboDisplay")
+    .textContent =
+      "COMBO x"+game.combo;
+
+  const comboProgress =
+    Math.min(
+      100,
+      (game.combo%10)*10
+    );
+
+  document
+    .getElementById("comboFill")
+    .style.width =
+      comboProgress+"%";
+
+}
+
+
+/* =========================================================
+   END GAME
+========================================================= */
+
+function endGame(){
+
+  if(!game || !game.running)
+    return;
+
+  game.running=false;
+
+  const oldBest =
+    save.highScore;
+
+  save.highScore =
+    Math.max(
+      save.highScore,
+      game.score
+    );
+
+  save.bestCombo =
+    Math.max(
+      save.bestCombo,
+      game.bestComboRound
+    );
+
+  save.totalStars +=
+    game.stars;
+
+  save.totalComets +=
+    game.comets;
+
+  save.totalGold +=
+    game.gold;
+
+  save.rounds++;
+
+
+  let earned =
+    game.score;
+
+  earned += 10;
+
+  if(game.score>=25)
+    earned += 10;
+
+  if(game.score>=45)
+    earned += 20;
+
+  if(game.bestComboRound>=10)
+    earned += 10;
+
+
+  earned =
+    Math.round(
+      earned*
+      save.settings.coinMultiplier
+    );
+
+
+  save.coins += earned;
+
+
+  /* missions */
+
+  updateMission(
+    "objects",
+    game.stars+
+    game.comets+
+    game.gold
+  );
+
+  updateMission(
+    "combo",
+    game.bestComboRound
+  );
+
+  updateMission(
+    "comets",
+    game.comets
+  );
+
+  updateMission(
+    "gold",
+    game.gold
+  );
+
+  updateMission(
+    "score",
+    game.score
+  );
+
+  if(!game.bombHit){
+
+    updateMission(
+      "noBomb",
+      1
+    );
+
+  }
+
+
+  /* badges */
+
+  unlockBadge(
+    "firstCatch",
+    game.stars+
+    game.comets+
+    game.gold >= 1
+  );
+
+  unlockBadge(
+    "collector",
+    save.totalStars >= 50
+  );
+
+  unlockBadge(
+    "comboMaster",
+    game.bestComboRound >= 10
+  );
+
+  unlockBadge(
+    "cometChaser",
+    save.totalComets >= 10
+  );
+
+  unlockBadge(
+    "bombDodger",
+    !game.bombHit
+  );
+
+  unlockBadge(
+    "master",
+    game.score >= 45
+  );
+
+  unlockBadge(
+    "speedDemon",
+    game.bestComboRound >= 15
+  );
+
+  unlockBadge(
+    "goldHunter",
+    save.totalGold >= 5
+  );
+
+  unlockBadge(
+    "legend",
+    game.score >= 75
+  );
+
+
+  persist();
+
+
+  document
+    .getElementById("resultScore")
+    .textContent =
+      game.score;
+
+  document
+    .getElementById("resultCoins")
+    .textContent =
+      earned;
+
+  document
+    .getElementById("resultStars")
+    .textContent =
+      game.stars;
+
+  document
+    .getElementById("resultComets")
+    .textContent =
+      game.comets;
+
+  document
+    .getElementById("resultCombo")
+    .textContent =
+      game.bestComboRound;
+
+  document
+    .getElementById("resultBest")
+    .textContent =
+      save.highScore;
+
+
+  let message =
+    game.score>=75
+      ? "LEGENDARY RUN. The vault is shaking. 👑"
+      : game.score>=45
+      ? "MASTER CATCHER. That was seriously clean. 🔥"
+      : game.score>=25
+      ? "STAR CATCHER. You're getting dangerous. ⚡"
+      : "Keep building that combo. Your next run can be better.";
+
+  if(
+    game.score>oldBest &&
+    oldBest>0
+  ){
+
+    message =
+      "NEW PERSONAL RECORD! 🏆";
+
+  }
+
+  document
+    .getElementById("resultMessage")
+    .textContent =
+      message;
+
+  showScreen("resultScreen");
+
+}
+
+
+/* =========================================================
+   BADGE UNLOCK
+========================================================= */
+
+function unlockBadge(id,condition){
+
+  if(
+    condition &&
+    !save.unlockedBadges.includes(id)
+  ){
+
+    save.unlockedBadges.push(id);
+
+    const badge =
+      BADGES.find(
+        b=>b.id===id
+      );
+
+    if(badge){
+
+      save.coins += badge.reward;
+
     }
 
+  }
 
-    // =====================================================
-    // DRAW STAR
-    // =====================================================
+}
 
-    function drawStar(x, y, radius, color, rotation) {
 
-        ctx.save();
+/* =========================================================
+   ADMIN
+========================================================= */
 
-        ctx.translate(x, y);
-        ctx.rotate(rotation);
+function openAdmin(){
 
-        ctx.beginPath();
+  const password =
+    prompt("🔐 Developer password:");
 
-        for (let i = 0; i < 10; i++) {
+  if(password === "lynnbluu"){
 
-            const angle = -Math.PI / 2 + i * Math.PI / 5;
+    document
+      .getElementById("coinMultiplier")
+      .value =
+        save.settings.coinMultiplier;
 
-            const currentRadius =
-                i % 2 === 0
-                    ? radius
-                    : radius * 0.45;
+    document
+      .getElementById("roundDuration")
+      .value =
+        save.settings.roundDuration;
 
-            const px = Math.cos(angle) * currentRadius;
-            const py = Math.sin(angle) * currentRadius;
+    showScreen("adminScreen");
 
-            if (i === 0) {
-                ctx.moveTo(px, py);
-            } else {
-                ctx.lineTo(px, py);
-            }
-        }
+  }
+  else if(password!==null){
 
-        ctx.closePath();
+    alert("❌ Incorrect password.");
 
-        ctx.fillStyle = color;
-        ctx.fill();
+  }
 
-        ctx.restore();
+}
+
+
+function adminCoins(amount){
+
+  save.coins += amount;
+
+  persist();
+
+  updateUI();
+
+  alert(
+    "Added "+
+    amount.toLocaleString()+
+    " coins."
+  );
+
+}
+
+
+function setExactCoins(){
+
+  const amount =
+    Number(
+      document
+        .getElementById("exactCoins")
+        .value
+    );
+
+  if(
+    !Number.isFinite(amount) ||
+    amount<0
+  ) return;
+
+  save.coins =
+    Math.floor(amount);
+
+  persist();
+
+  updateUI();
+
+}
+
+
+function unlockAllHeroes(){
+
+  save.ownedHeroes =
+    HEROES.map(
+      h=>h.id
+    );
+
+  persist();
+
+  alert(
+    "All heroes unlocked."
+  );
+
+}
+
+
+function unlockAllAccessories(){
+
+  save.ownedAccessories =
+    ACCESSORIES.map(
+      a=>a.id
+    );
+
+  persist();
+
+  alert(
+    "All accessories unlocked."
+  );
+
+}
+
+
+function unlockAllBadges(){
+
+  save.unlockedBadges =
+    BADGES.map(
+      b=>b.id
+    );
+
+  persist();
+
+  updateUI();
+
+  alert(
+    "All badges unlocked."
+  );
+
+}
+
+
+function setAdminScore(){
+
+  const score =
+    Number(
+      document
+        .getElementById("adminScore")
+        .value
+    );
+
+  if(score>=0){
+
+    save.highScore =
+      Math.floor(score);
+
+    persist();
+
+    updateUI();
+
+  }
+
+}
+
+
+function setAdminCombo(){
+
+  const combo =
+    Number(
+      document
+        .getElementById("adminCombo")
+        .value
+    );
+
+  if(combo>=0){
+
+    save.bestCombo =
+      Math.floor(combo);
+
+    persist();
+
+  }
+
+}
+
+
+function saveAdminSettings(){
+
+  const multiplier =
+    Number(
+      document
+        .getElementById("coinMultiplier")
+        .value
+    );
+
+  const duration =
+    Number(
+      document
+        .getElementById("roundDuration")
+        .value
+    );
+
+  if(multiplier>=1)
+    save.settings.coinMultiplier =
+      multiplier;
+
+  if(duration>=5)
+    save.settings.roundDuration =
+      duration;
+
+  persist();
+
+  alert(
+    "Developer settings saved."
+  );
+
+}
+
+
+function hardReset(){
+
+  const ok =
+    confirm(
+      "Delete ALL progress?"
+    );
+
+  if(!ok) return;
+
+  localStorage.removeItem(
+    SAVE_KEY
+  );
+
+  location.reload();
+
+}
+
+
+/* =========================================================
+   UTILITY
+========================================================= */
+
+function roundRect(
+  ctx,
+  x,
+  y,
+  w,
+  h,
+  r
+){
+
+  ctx.beginPath();
+
+  ctx.roundRect(
+    x,
+    y,
+    w,
+    h,
+    r
+  );
+
+  ctx.fill();
+
+}
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+window.addEventListener(
+  "keydown",
+  e=>{
+
+    if(
+      e.key==="ArrowLeft" ||
+      e.key.toLowerCase()==="a"
+    ){
+
+      keys.left=true;
+
     }
 
+    if(
+      e.key==="ArrowRight" ||
+      e.key.toLowerCase()==="d"
+    ){
 
-    // =====================================================
-    // DRAW COMET
-    // =====================================================
+      keys.right=true;
 
-    function drawComet(star) {
-
-        ctx.save();
-
-        // Comet trail
-        const gradient = ctx.createLinearGradient(
-            star.x,
-            star.y - 90,
-            star.x,
-            star.y
-        );
-
-        gradient.addColorStop(0, "rgba(80,160,255,0)");
-        gradient.addColorStop(1, "rgba(80,160,255,0.7)");
-
-        ctx.strokeStyle = gradient;
-        ctx.lineWidth = 12;
-        ctx.lineCap = "round";
-
-        ctx.beginPath();
-        ctx.moveTo(star.x, star.y - 90);
-        ctx.lineTo(star.x, star.y);
-        ctx.stroke();
-
-        // Little comet lines
-        ctx.strokeStyle = "rgba(150,210,255,0.8)";
-        ctx.lineWidth = 3;
-
-        ctx.beginPath();
-        ctx.moveTo(star.x - 15, star.y - 55);
-        ctx.lineTo(star.x - 28, star.y - 75);
-
-        ctx.moveTo(star.x + 12, star.y - 35);
-        ctx.lineTo(star.x + 28, star.y - 55);
-
-        ctx.stroke();
-
-        drawStar(
-            star.x,
-            star.y,
-            star.size,
-            "#38bdf8",
-            star.rotation
-        );
-
-        ctx.restore();
     }
 
+  }
+);
 
-    // =====================================================
-    // DRAW BOMB
-    // =====================================================
 
-    function drawBomb(bomb) {
+window.addEventListener(
+  "keyup",
+  e=>{
 
-        ctx.save();
+    if(
+      e.key==="ArrowLeft" ||
+      e.key.toLowerCase()==="a"
+    ){
 
-        ctx.translate(bomb.x, bomb.y);
+      keys.left=false;
 
-        // Fuse
-        ctx.strokeStyle = "#777";
-        ctx.lineWidth = 3;
-
-        ctx.beginPath();
-        ctx.moveTo(0, -bomb.size / 2);
-        ctx.quadraticCurveTo(
-            5,
-            -bomb.size - 10,
-            12,
-            -bomb.size - 4
-        );
-        ctx.stroke();
-
-        // Spark
-        ctx.fillStyle =
-            Math.sin(animationTime * 12) > 0
-                ? "#ffcc00"
-                : "#ff5c33";
-
-        ctx.beginPath();
-        ctx.arc(12, -bomb.size - 5, 5, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Bomb body
-        ctx.fillStyle = "#050505";
-
-        ctx.beginPath();
-        ctx.arc(
-            0,
-            0,
-            bomb.size / 2,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-        // Highlight
-        ctx.fillStyle = "#444";
-
-        ctx.beginPath();
-        ctx.arc(
-            -6,
-            -7,
-            5,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-        ctx.restore();
     }
 
+    if(
+      e.key==="ArrowRight" ||
+      e.key.toLowerCase()==="d"
+    ){
 
-    // =====================================================
-    // DRAW PLAYER
-    // =====================================================
+      keys.right=false;
 
-    function drawPlayer() {
-
-        const walking =
-            keys["ArrowLeft"] ||
-            keys["ArrowRight"];
-
-        const bounce =
-            walking
-                ? Math.sin(animationTime * 12) * 3
-                : Math.sin(animationTime * 3) * 1;
-
-        const x = player.x;
-        const y = player.y + bounce;
-
-        ctx.save();
-
-        // -------------------------------
-        // Shadow
-        // -------------------------------
-
-        ctx.fillStyle = "rgba(0,0,0,0.3)";
-
-        ctx.beginPath();
-
-        ctx.ellipse(
-            x + 35,
-            y + 88,
-            30,
-            7,
-            0,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-
-        // -------------------------------
-        // Legs
-        // -------------------------------
-
-        ctx.strokeStyle = "#263238";
-        ctx.lineWidth = 9;
-        ctx.lineCap = "round";
-
-        const legMovement =
-            walking
-                ? Math.sin(animationTime * 12) * 7
-                : 0;
-
-        ctx.beginPath();
-
-        ctx.moveTo(x + 28, y + 65);
-        ctx.lineTo(
-            x + 25 + legMovement,
-            y + 82
-        );
-
-        ctx.moveTo(x + 43, y + 65);
-        ctx.lineTo(
-            x + 46 - legMovement,
-            y + 82
-        );
-
-        ctx.stroke();
-
-
-        // -------------------------------
-        // Body
-        // -------------------------------
-
-        ctx.fillStyle = "#5b8def";
-
-        ctx.beginPath();
-
-        ctx.roundRect(
-            x + 15,
-            y + 30,
-            35,
-            42,
-            12
-        );
-
-        ctx.fill();
-
-
-        // -------------------------------
-        // Head
-        // -------------------------------
-
-        ctx.fillStyle = "#ffd2a6";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            x + 32,
-            y + 18,
-            22,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-
-        // -------------------------------
-        // Hair
-        // -------------------------------
-
-        ctx.fillStyle = "#3a2520";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            x + 32,
-            y + 10,
-            21,
-            Math.PI,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-
-        // -------------------------------
-        // Eyes
-        // -------------------------------
-
-        ctx.fillStyle = "#111";
-
-        ctx.beginPath();
-        ctx.arc(x + 24, y + 19, 2.5, 0, Math.PI * 2);
-        ctx.arc(x + 40, y + 19, 2.5, 0, Math.PI * 2);
-        ctx.fill();
-
-
-        // -------------------------------
-        // Arms
-        // -------------------------------
-
-        ctx.strokeStyle = "#ffd2a6";
-        ctx.lineWidth = 8;
-
-        ctx.beginPath();
-
-        ctx.moveTo(x + 17, y + 40);
-        ctx.lineTo(x + 5, y + 55);
-
-        ctx.moveTo(x + 48, y + 40);
-        ctx.lineTo(x + 60, y + 55);
-
-        ctx.stroke();
-
-
-        // -------------------------------
-        // Basket
-        // -------------------------------
-
-        ctx.fillStyle = "#c58a45";
-
-        ctx.beginPath();
-
-        ctx.moveTo(x + 7, y + 52);
-        ctx.lineTo(x + 63, y + 52);
-        ctx.lineTo(x + 56, y + 78);
-        ctx.lineTo(x + 14, y + 78);
-
-        ctx.closePath();
-
-        ctx.fill();
-
-
-        // Basket stripes
-        ctx.strokeStyle = "#8a5a25";
-        ctx.lineWidth = 3;
-
-        for (let i = 0; i < 4; i++) {
-
-            const basketX = x + 17 + i * 12;
-
-            ctx.beginPath();
-
-            ctx.moveTo(basketX, y + 55);
-            ctx.lineTo(basketX + 3, y + 75);
-
-            ctx.stroke();
-        }
-
-        ctx.restore();
     }
 
+  }
+);
 
-    // =====================================================
-    // COLLISION DETECTION
-    // =====================================================
 
-    function isColliding(object) {
+/* =========================================================
+   TOUCH
+========================================================= */
 
-        return (
-            object.x + object.size >
-                player.x &&
+function holdButton(
+  element,
+  direction
+){
 
-            object.x - object.size <
-                player.x + player.width &&
+  const start=e=>{
 
-            object.y + object.size >
-                player.y &&
+    e.preventDefault();
 
-            object.y - object.size <
-                player.y + player.height
-        );
-    }
+    keys[direction]=true;
 
+  };
 
-    // =====================================================
-    // UPDATE STARS
-    // =====================================================
+  const stop=e=>{
 
-    function updateStars(deltaTime) {
+    e.preventDefault();
 
-        for (let i = stars.length - 1; i >= 0; i--) {
+    keys[direction]=false;
 
-            const star = stars[i];
+  };
 
-            star.y += star.speed * deltaTime;
+  element.addEventListener(
+    "pointerdown",
+    start
+  );
 
-            star.rotation += deltaTime * 2;
+  element.addEventListener(
+    "pointerup",
+    stop
+  );
 
+  element.addEventListener(
+    "pointercancel",
+    stop
+  );
 
-            // Catch star
-            if (isColliding(star)) {
+  element.addEventListener(
+    "pointerleave",
+    stop
+  );
 
-                if (star.type === "yellow") {
-                    score += 1;
-                }
+}
 
-                else if (star.type === "red") {
-                    score += 2;
-                }
 
-                else if (star.type === "blue") {
-                    score += 3;
-                }
+holdButton(
+  document.getElementById("leftBtn"),
+  "left"
+);
 
-                combo++;
+holdButton(
+  document.getElementById("rightBtn"),
+  "right"
+);
 
-                stars.splice(i, 1);
 
-                continue;
-            }
+/* =========================================================
+   CANVAS POINTER CONTROL
+========================================================= */
 
+canvas.addEventListener(
+  "pointermove",
+  e=>{
 
-            // Remove when off screen
-            if (star.y > canvas.height + 50) {
+    if(!game || !game.running)
+      return;
 
-                // Missing a star breaks combo
-                combo = 0;
+    const rect =
+      canvas.getBoundingClientRect();
 
-                stars.splice(i, 1);
-            }
-        }
-    }
+    const x =
+      (e.clientX-rect.left)/
+      rect.width*
+      canvas.width;
 
+    game.player.x =
+      Math.max(
+        50,
+        Math.min(
+          550,
+          x
+        )
+      );
 
-    // =====================================================
-    // UPDATE BOMBS
-    // =====================================================
+  }
+);
 
-    function updateBombs(deltaTime) {
 
-        for (let i = bombs.length - 1; i >= 0; i--) {
+/* =========================================================
+   INIT
+========================================================= */
 
-            const bomb = bombs[i];
+if(!save.missions.length){
 
-            bomb.y += bomb.speed * deltaTime;
+  generateMissions();
 
+}
 
-            // Hit bomb
-            if (isColliding(bomb)) {
-
-                score -= 2;
-
-                // Score cannot go below zero
-                if (score < 0) {
-                    score = 0;
-                }
-
-                combo = 0;
-
-                bombs.splice(i, 1);
-
-                continue;
-            }
-
-
-            // Remove bomb
-            if (bomb.y > canvas.height + 50) {
-
-                bombs.splice(i, 1);
-            }
-        }
-    }
-
-
-    // =====================================================
-    // MOVE PLAYER
-    // =====================================================
-
-    function updatePlayer(deltaTime) {
-
-        if (keys["ArrowLeft"]) {
-            player.x -= player.speed * deltaTime;
-        }
-
-        if (keys["ArrowRight"]) {
-            player.x += player.speed * deltaTime;
-        }
-
-
-        // Screen boundaries
-
-        if (player.x < 0) {
-            player.x = 0;
-        }
-
-        if (player.x + player.width > canvas.width) {
-            player.x =
-                canvas.width - player.width;
-        }
-    }
-
-
-    // =====================================================
-    // DRAW BACKGROUND
-    // =====================================================
-
-    function drawBackground() {
-
-        // Stars in background
-
-        ctx.fillStyle = "rgba(255,255,255,0.4)";
-
-        const backgroundStars = [
-            [60, 100],
-            [140, 170],
-            [230, 90],
-            [350, 140],
-            [460, 80],
-            [540, 190],
-            [90, 300],
-            [400, 260],
-            [520, 350]
-        ];
-
-        for (const point of backgroundStars) {
-
-            ctx.beginPath();
-
-            ctx.arc(
-                point[0],
-                point[1],
-                2,
-                0,
-                Math.PI * 2
-            );
-
-            ctx.fill();
-        }
-    }
-
-
-    // =====================================================
-    // DRAW UI
-    // =====================================================
-
-    function drawUI() {
-
-        // Score
-
-        ctx.fillStyle = "white";
-        ctx.font = "bold 25px Arial";
-
-        ctx.fillText(
-            "⭐ " + score,
-            20,
-            38
-        );
-
-
-        // Timer
-
-        ctx.fillStyle =
-            timeLeft <= 10
-                ? "#ff5555"
-                : "white";
-
-        ctx.fillText(
-            "⏱ " + Math.ceil(timeLeft),
-            480,
-            38
-        );
-
-
-        // Combo
-
-        if (combo >= 2) {
-
-            ctx.fillStyle = "#ffd700";
-            ctx.font = "bold 20px Arial";
-
-            ctx.textAlign = "center";
-
-            ctx.fillText(
-                "COMBO x" + combo,
-                canvas.width / 2,
-                38
-            );
-
-            ctx.textAlign = "left";
-        }
-    }
-
-
-    // =====================================================
-    // GAME OVER SCREEN
-    // =====================================================
-
-    function drawGameOver() {
-
-        ctx.fillStyle = "rgba(0,0,0,0.75)";
-
-        ctx.fillRect(
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-
-
-        ctx.textAlign = "center";
-
-        ctx.fillStyle = "white";
-
-        ctx.font = "bold 48px Arial";
-
-        ctx.fillText(
-            "TIME'S UP!",
-            canvas.width / 2,
-            250
-        );
-
-
-        ctx.font = "bold 38px Arial";
-
-        ctx.fillText(
-            "⭐ " + score,
-            canvas.width / 2,
-            320
-        );
-
-
-        // Reward
-
-        let title;
-        let reward;
-
-        if (score >= 45) {
-
-            title = "👑 MASTER CATCHER";
-            reward = "Gold Reward";
-
-        }
-
-        else if (score >= 25) {
-
-            title = "🥈 STAR CATCHER";
-            reward = "Silver Reward";
-
-        }
-
-        else {
-
-            title = "🥉 BASKET BEGINNER";
-            reward = "Bronze Reward";
-        }
-
-
-        ctx.font = "bold 26px Arial";
-
-        ctx.fillStyle = "#ffd700";
-
-        ctx.fillText(
-            title,
-            canvas.width / 2,
-            390
-        );
-
-
-        ctx.font = "20px Arial";
-
-        ctx.fillStyle = "white";
-
-        ctx.fillText(
-            reward,
-            canvas.width / 2,
-            430
-        );
-
-
-        ctx.font = "18px Arial";
-
-        ctx.fillText(
-            "Press SPACE to try again",
-            canvas.width / 2,
-            500
-        );
-
-
-        ctx.textAlign = "left";
-    }
-
-
-    // =====================================================
-    // RESTART
-    // =====================================================
-
-    function restartGame() {
-
-        score = 0;
-        combo = 0;
-
-        timeLeft = GAME_TIME;
-
-        stars = [];
-        bombs = [];
-
-        spawnTimer = 0;
-
-        player.x = 275;
-
-        gameState = "playing";
-
-        lastTime = performance.now();
-    }
-
-
-    // =====================================================
-    // MAIN GAME LOOP
-    // =====================================================
-
-    function gameLoop(currentTime) {
-
-        const deltaTime =
-            Math.min(
-                (currentTime - lastTime) / 1000,
-                0.05
-            );
-
-        lastTime = currentTime;
-
-        animationTime += deltaTime;
-
-
-        // ---------------------------------------------
-        // PLAYING
-        // ---------------------------------------------
-
-        if (gameState === "playing") {
-
-            timeLeft -= deltaTime;
-
-            if (timeLeft <= 0) {
-
-                timeLeft = 0;
-
-                gameState = "gameover";
-            }
-
-            else {
-
-                updatePlayer(deltaTime);
-
-                spawnObjects(deltaTime);
-
-                updateStars(deltaTime);
-
-                updateBombs(deltaTime);
-            }
-        }
-
-
-        // ---------------------------------------------
-        // DRAW
-        // ---------------------------------------------
-
-        ctx.clearRect(
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-
-        drawBackground();
-
-
-        // Stars
-
-        for (const star of stars) {
-
-            if (star.type === "yellow") {
-
-                drawStar(
-                    star.x,
-                    star.y,
-                    star.size,
-                    "#ffd43b",
-                    star.rotation
-                );
-            }
-
-            else if (star.type === "red") {
-
-                drawStar(
-                    star.x,
-                    star.y,
-                    star.size,
-                    "#ff4d5a",
-                    star.rotation
-                );
-            }
-
-            else if (star.type === "blue") {
-
-                drawComet(star);
-            }
-        }
-
-
-        // Bombs
-
-        for (const bomb of bombs) {
-            drawBomb(bomb);
-        }
-
-
-        // Player
-
-        drawPlayer();
-
-        // UI
-
-        drawUI();
-
-
-        // Game over
-
-        if (gameState === "gameover") {
-            drawGameOver();
-        }
-
-
-        requestAnimationFrame(gameLoop);
-    }
-
-
-    // =====================================================
-    // START
-    // =====================================================
-
-    requestAnimationFrame(gameLoop);
+updateUI();
 
 </script>
 
